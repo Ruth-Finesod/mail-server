@@ -9,7 +9,7 @@ class ClientAuth:
     def __init__(self, method: ServerMethods):
         self.email = ''
         self.password = ''
-        self.cookie = b''
+        self.cookie = ''
         if method == ServerMethods.LOG_IN:
             self.input_log_in()
         elif method == ServerMethods.SIGN_UP:
