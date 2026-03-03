@@ -1,6 +1,7 @@
 from typing import Tuple
 from client_send import send
 from server_methods import ServerMethods
+from communication_objects import SignUp, Login, GenericResponse
 
 
 class ClientAuth:
@@ -10,37 +11,44 @@ class ClientAuth:
         self.password = ''
         self.cookie = b''
         if method == ServerMethods.LOG_IN:
-            self.log_in()
+            self.input_log_in()
         elif method == ServerMethods.SIGN_UP:
-            self.sign_up()
+            self.input_sign_up()
 
-    def log_in(self):
+    def input_log_in(self):
         self.email = input('email address: ')
         self.password = input('password: ')
-        request = {ServerMethods.LOG_IN: {'email': self.email, 'password': self.password}}
-        response = send(request)
-        flag, message = response[0], response[1:]
-        if flag == b'1':
-            self.cookie = message
-        else:
-            print(message)
-            self.log_in()
+        self.send_log_in()
 
-    def sign_up(self):
+    def send_log_in(self):
+        request_data = {'email': self.email, 'password': self.password}
+        request_body = Login(**request_data)
+        request = {ServerMethods.LOG_IN: request_body.model_dump()}
+        response = GenericResponse(**send(request))
+        if response.status:
+            self.cookie = response.message
+        else:
+            print(response.message)
+            self.input_log_in()
+
+    def input_sign_up(self):
         self.email = input('email address: ')
         name = input('full name: ')
         self.password = input('password: ')
         repeat_password = input('repeat password: ')
         if not self.password_validation(repeat_password):
-            self.sign_up()
-        request = {ServerMethods.SIGN_UP: {'email': self.email, 'name': name, 'password': self.password}}
-        response = send(request)
-        flag, message = response[0], response[1:]
-        print(message)
-        if flag == b'1':
-            self.log_in()
+            self.send_sign_up(name)
+
+    def send_sign_up(self, name):
+        request_data = {'email': self.email, 'name': name, 'password': self.password}
+        request_body = SignUp(**request_data)
+        request = {ServerMethods.SIGN_UP: request_body.model_dump()}
+        response = GenericResponse(**send(request))
+        print(response.message)
+        if response.status:
+            self.send_log_in()
         else:
-            self.sign_up()
+            self.input_sign_up()
 
     def password_validation(self, repeat_password: str) -> bool:
         if self.password != repeat_password:
@@ -53,12 +61,6 @@ class ClientAuth:
         else:
             return True
         return False
-
-
-def authenticate() -> ClientAuth:
-    method = pick_method()
-    user = ClientAuth(method)
-    return user
 
 
 def pick_method() -> ServerMethods:

@@ -1,8 +1,9 @@
-from client_auth import authenticate
+from client_auth import ClientAuth, pick_method
 
 
 def main():
-    user = authenticate()
+    method = pick_method()
+    user = ClientAuth(method)
 
 
 if __name__ == '__main__':
