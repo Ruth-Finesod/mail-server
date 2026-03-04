@@ -35,6 +35,12 @@ class GenericResponse(BaseModel):
     message: str
 
 
+class LogInResponse(BaseModel):
+    status: bool
+    message: str
+    cookie: str
+
+
 class MsgResponse(BaseModel):
     sender_email: str
     sent_time: float

@@ -1,51 +1,30 @@
-import socketserver
 import json
-from datetime import datetime
-from typing import Tuple
+import socketserver
+from server_methods import ServerMethods
+from server_auth import ServerAuth
+from DBHandler import DBHandler
 
 HOST, PORT = "localhost", 9999
-USERS_PATH = "json files/users.json"
-MSGS_PATH = "json files/messages.json"
-USER_PARMS = ['username', 'password', 'last_read']
+AUTH_METHODS = [ServerMethods.LOG_IN, ServerMethods.SIGN_UP]
+MSGS_METHODS = [ServerMethods.SEND_MESSAGE, ServerMethods.RECEIVE_MESSAGES]
+
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
+    auth_dbhandler = DBHandler('path')
+
     def handle(self):
         data = self.request.recv(1024)
-        print(f"Received from {self.client_address[0]}:")
-        request_dict = json.loads(data.decode("utf-8"))
-        for func_name, kwargs in request_dict:
-            code, msg = exec(f"self.{func_name}(**{kwargs})")
-            self.request.sendall(b'{code}{msg}')
+        request = json.loads(data.decode("utf-8"))
+        request_type, request_body = request.popitem()
+        if request_type in AUTH_METHODS:
+            a = ServerAuth(self.auth_dbhandler)
+            if request_type == ServerMethods.LOG_IN:
+                response = a.log_in(request_body)
+            elif request_type == ServerMethods.SIGN_UP:
+                response = a.sign_up(request_body)
+        response = json.dumps(response)
+        self.request.sendall(response)
 
-    @staticmethod
-    def get_user(username: str):
-        users = json.load(open(USERS_PATH, "r"))
-        for user in users:
-            if user["username"] == username:
-                return user
-        return None
-
-    def server_sign_up(self, username, hashed_password):
-        if not self.get_user(username):
-            users = json.load(open(USERS_PATH, "r"))
-            users.append(zip(USER_PARMS, [username, hashed_password, datetime.today()]))
-            json.dump(users, open(USERS_PATH, "w"))
-            return 1, 'successfully signed up'
-        else:
-            return 0, 'username already exists'
-
-    def server_login(self, username: str, hashed_password: str):
-        user = self.get_user(username)
-        if user:
-            if user["password"] == hashed_password:
-                return 1, 'logged in successfully'
-            else:
-                return 0, 'login failed, password is incorrect'
-        else:
-            return 0, 'login failed, username does not exist'
-
-    def server_send_msgs(self, username):
-        user = self.get_user(username)
 
 if __name__ == "__main__":
     # Create the server, binding to localhost on port 9999
