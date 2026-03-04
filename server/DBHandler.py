@@ -43,9 +43,13 @@ class DBHandler:
 
     def write(self, table_name, row: Dict):
         self.varify_keys(table_name, row.keys())
-
+        self.cur.execute(SELECT.replace('table', table_name))
+        print(self.cur.fetchone())
         self.cur.execute(f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
+        self.con.commit()
 
+    def close(self):
+        self.con.close()
 
 class NoSuchColumnError(Exception):
     pass
