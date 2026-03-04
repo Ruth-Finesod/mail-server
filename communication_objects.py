@@ -13,18 +13,15 @@ class Login(BaseModel):
 
 
 class SendMsg(BaseModel):
-    sender_id: str
     sender_email: str
     sender_password: str
     cookie: str
-    reciever_email: str
-    sent_time: float
+    receiver_email: str
     subject: str
     msg: str
 
 
 class GetMsg(BaseModel):
-    id: str
     email: str
     password: str
     cookie: str
