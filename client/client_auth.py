@@ -6,14 +6,11 @@ from communication_objects import SignUp, Login, GenericResponse, LogInResponse
 
 class ClientAuth:
 
-    def __init__(self, method: ServerMethods):
+    def __init__(self):
         self.email = ''
         self.password = ''
         self.cookie = ''
-        if method == ServerMethods.LOG_IN:
-            self.input_log_in()
-        elif method == ServerMethods.SIGN_UP:
-            self.input_sign_up()
+        self.pick_method()
 
     def input_log_in(self):
         self.email = input('email address: ')
@@ -68,13 +65,13 @@ class ClientAuth:
         return False
 
 
-def pick_method() -> ServerMethods:
-    print('how would you like to authenticate?')
-    choices = {'l': ServerMethods.LOG_IN, 's': ServerMethods.SIGN_UP}
-    choice = input('l: log in\ns: sign up\nyour choice: ')
-    picked_method = choices.get(choice)
-    if picked_method:
-        return picked_method
-    else:
-        print('you must pick one of the presented options')
-        return pick_method()
+    def pick_method(self):
+        print('how would you like to authenticate?')
+        choices = {'l': self.input_log_in, 's': self.input_sign_up}
+        choice = input('l: log in\ns: sign up\nyour choice: ')
+        picked_method = choices.get(choice)
+        if picked_method:
+            picked_method()
+        else:
+            print('you must pick one of the presented options')
+            self.pick_method()

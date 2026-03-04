@@ -1,10 +1,11 @@
-from client_auth import ClientAuth, pick_method
+from client.msg_handler import MsgHandler
+from client_auth import ClientAuth
 
 
 def main():
-    method = pick_method()
-    user = ClientAuth(method)
-
+    user = ClientAuth()
+    while True:
+        MsgHandler(user)
 
 
 if __name__ == '__main__':
