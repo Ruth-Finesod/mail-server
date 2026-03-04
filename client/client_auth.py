@@ -1,7 +1,7 @@
 from typing import Tuple
 from client_send import send
 from server_methods import ServerMethods
-from communication_objects import SignUp, Login, GenericResponse
+from communication_objects import SignUp, Login, GenericResponse, LogInResponse
 
 
 class ClientAuth:
@@ -25,11 +25,11 @@ class ClientAuth:
         request_body = Login(**request_data)
         request = {ServerMethods.LOG_IN.value: request_body.model_dump()}
         response = send(request)
-        response = GenericResponse(**response)
+        response = LogInResponse(**response)
+        print(response.message)
         if response.status:
-            self.cookie = response.message
+            self.cookie = response.cookie
         else:
-            print(response.message)
             self.input_log_in()
 
     def input_sign_up(self):
@@ -39,6 +39,8 @@ class ClientAuth:
         repeat_password = input('repeat password: ')
         if self.password_validation(repeat_password):
             self.send_sign_up(name)
+        else:
+            self.input_sign_up()
 
     def send_sign_up(self, name):
         request_data = {'email': self.email, 'name': name, 'password': self.password}
@@ -57,9 +59,10 @@ class ClientAuth:
             print('passwords not match')
         elif len(self.password) < 8:
             print('password must be at least 8 characters')
-        elif self.password.islower():
-            print('password must have at least one uppercase character')
-        # more checks
+        elif self.password.isnumeric() or self.password.isalpha():
+            print('password must have numbers and letters')
+        elif self.password.islower() or self.password.isupper():
+            print('password must have both uppercase and lowercase characters')
         else:
             return True
         return False

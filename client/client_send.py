@@ -6,7 +6,7 @@ import json
 HOST, PORT = "localhost", 9999
 
 
-def send(data: Dict[ServerMethods, Any]) -> Dict[str, Any]:
+def send(data: Dict[int, Any]) -> Dict[str, Any]:
     # Create a socket (SOCK_STREAM means a TCP socket)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         # Connect to server and send data
