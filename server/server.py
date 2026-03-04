@@ -3,12 +3,14 @@ import socketserver
 
 from DBHandler import DBHandler
 from server_auth import ServerAuth
+from server_msgs import ServerMsgs
 from server_methods import ServerMethods
 
 HOST, PORT = "localhost", 9999
 METHODS = {
     ServerMethods.LOG_IN.value: ServerAuth.log_in,
-    ServerMethods.SIGN_UP.value: ServerAuth.sign_up
+    ServerMethods.SIGN_UP.value: ServerAuth.sign_up,
+    ServerMethods.SEND_MESSAGE.value: ServerMsgs.send_msg
 }
 
 

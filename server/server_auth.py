@@ -14,7 +14,7 @@ class ServerAuth:
         hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
         user = cls.db.query('users', {'email': request.email, 'password': hashed_password})
         if user:
-            cookie = CookieHandler.sign(request.email + str(hashed_password))
+            cookie = CookieHandler.sign(request.email + hashed_password)
             response_data = {'status': True, 'message': 'logged in successfully', 'cookie': cookie}
             response = LogInResponse(**response_data)
         else:
