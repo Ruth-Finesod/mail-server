@@ -6,6 +6,5 @@ def main():
     user = ClientAuth(method)
 
 
-
 if __name__ == '__main__':
     main()
