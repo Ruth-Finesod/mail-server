@@ -1,5 +1,5 @@
 from client.client_auth import ClientAuth
-from communication_objects import SendMsg, GenericResponse
+from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse
 from server_methods import ServerMethods
 from client_send import send
 
@@ -23,7 +23,15 @@ class MsgHandler:
         print(response.message)
 
     def receive_message(self):
-        pass
+        body_request = GetMsg(email=self.user.email, password=self.user.password, cookie=self.user.cookie)
+        request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
+        response = send(request)
+        for msg in response:
+            msg = MsgResponse(msg)
+            print('new message')
+            print(f'from: {msg.sender_email}')
+            print(f'subject: {msg.subject}')
+            print(f'message: {msg.msg}\n')
 
     def pick_method(self):
         print('what do you like to you do?')
