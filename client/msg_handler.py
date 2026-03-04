@@ -5,12 +5,10 @@ from client_send import send
 
 
 class MsgHandler:
-    def __init__(self, user: ClientAuth, method: ServerMethods):
+    def __init__(self, user: ClientAuth):
         self.user = user
-        if method == ServerMethods.SEND_MESSAGE:
-            self.send_message()
-        if method == ServerMethods.RECEIVE_MESSAGES:
-            self.receive_message()
+        self.pick_method()
+
 
     def send_message(self):
         receiver = input("send message to: ")
@@ -24,8 +22,18 @@ class MsgHandler:
         response = LogInResponse(**response)
         print(response.message)
 
-def receive_message(self):
-    pass
+    def receive_message(self):
+        pass
 
+    def pick_method(self):
+        print('what do you like to you do?')
+        choices = {'s': self.send_message, 'r': self.receive_message}
+        choice = input('s: send message\nr: receive messages\nyour choice: ')
+        picked_method = choices.get(choice)
+        if picked_method:
+            picked_method()
+        else:
+            print('you must pick one of the presented options')
+            self.pick_method()
 
 
