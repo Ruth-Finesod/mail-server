@@ -1,13 +1,16 @@
 from typing import Dict, List
+import sqlite3
 
 DB = "mail_server_db.db"
 
 SELECT = f"""
 SELECT *
-FROM table """
+FROM table
+"""
 
 INSERT = f"""
-INSERT INTO table VALUES"""
+INSERT INTO table 
+"""
 
 MSGS_COLUMNS = ['sender_uid', 'receiver_uid', 'subject', 'message', 'send_time']
 USERS_COLUMNS = ['uid', 'email', 'name', 'password']
@@ -28,23 +31,20 @@ class DBHandler:
             if key not in columns:
                 raise NoSuchColumnError
 
-
     def query(self, table_name, q: Dict) -> List[Dict]:
         self.varify_keys(table_name, q.keys())
-        query = SELECT.replece('table', table_name)
-        query += f"WHERE {q.items()[0][0]}={q.items()[0][1]}"
-        if len(q.items()) > 1:
-            for key, item in q.items()[1:]:
-                query += f"AND {key}={item}"
+        query = SELECT.replace('table', table_name)
+        item = q.popitem()
+        query += f"WHERE {item[0]}='{item[1]}'"
+        for key, item in q.items():
+            query += f"AND {key}='{item}'"
         self.cur.execute(query)
         return self.cur.fetchall()
 
-
     def write(self, table_name, row: Dict):
-        self.varify_keys(table_name, q.keys())
-        self.cur.execute(INSERT.replece('table', table_name), row.items())
+        self.varify_keys(table_name, row.keys())
+        self.cur.execute(f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
+
 
 class NoSuchColumnError(Exception):
     pass
-
-

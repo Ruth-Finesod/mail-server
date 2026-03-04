@@ -14,5 +14,6 @@ def send(data: Dict[ServerMethods, Any]) -> Dict[str, Any]:
         data = json.dumps(data)
         sock.sendall(bytes(data, "utf-8"))
         # Receive data from the server and shut down
-        received = json.loads(sock.recv(1024))
+        received = sock.recv(1024)
+        received = json.loads(received)
     return received
