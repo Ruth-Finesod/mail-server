@@ -22,7 +22,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
-        response = json.dumps(response.model_dump())
+        if type(response) == list:
+            response = [i.model_dump() for i in response]
+            response = json.dumps(response)
+        else:
+            response = json.dumps(response.model_dump())
         self.request.sendall(bytes(response, "utf-8"))
 
 

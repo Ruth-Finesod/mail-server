@@ -24,10 +24,10 @@ class MsgHandler:
 
     def receive_message(self):
         body_request = GetMsg(email=self.user.email, password=self.user.password, cookie=self.user.cookie)
-        request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
+        request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         for msg in response:
-            msg = MsgResponse(msg)
+            msg = MsgResponse(**msg)
             print('new message')
             print(f'from: {msg.sender_email}')
             print(f'subject: {msg.subject}')
