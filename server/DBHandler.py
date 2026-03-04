@@ -3,13 +3,18 @@ import sqlite3
 
 DB = "mail_server_db.db"
 
-SELECT = f"""
+SELECT = """
 SELECT *
 FROM table
 """
 
-INSERT = f"""
+INSERT = """
 INSERT INTO table 
+"""
+
+MAX = """
+SELECT MAX(uid)
+FROM table
 """
 
 MSGS_COLUMNS = ['sender_uid', 'receiver_uid', 'subject', 'message', 'send_time']
@@ -41,10 +46,18 @@ class DBHandler:
         self.cur.execute(query)
         return self.cur.fetchall()
 
+    def get_uid(self, table_name):
+        self.cur.execute(MAX.replace('table', table_name))
+        max_uid = self.cur.fetchone()
+        if max_uid[0]:
+            return max_uid[0] + 1
+        else:
+            return 1
+
     def write(self, table_name, row: Dict):
         self.varify_keys(table_name, row.keys())
-        self.cur.execute(SELECT.replace('table', table_name))
-        print(self.cur.fetchone())
+        row['uid'] = self.get_uid(table_name)
+        print(row)
         self.cur.execute(f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
 
