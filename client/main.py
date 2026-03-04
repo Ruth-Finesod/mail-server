@@ -7,5 +7,6 @@ def main():
     while True:
         MsgHandler(user)
 
+
 if __name__ == '__main__':
     main()
