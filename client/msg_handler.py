@@ -1,5 +1,5 @@
 from client.client_auth import ClientAuth
-from communication_objects import SendMsg, LogInResponse
+from communication_objects import SendMsg, GenericResponse
 from server_methods import ServerMethods
 from client_send import send
 
@@ -19,7 +19,7 @@ class MsgHandler:
         body_request = SendMsg(**msg)
         request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
         response = send(request)
-        response = LogInResponse(**response)
+        response = GenericResponse(**response)
         print(response.message)
 
     def receive_message(self):
