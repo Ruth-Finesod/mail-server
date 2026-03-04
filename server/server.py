@@ -9,6 +9,8 @@ MSGS_PATH = "json files/messages.json"
 USER_PARMS = ['username', 'password', 'last_read']
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
+
+
     def handle(self):
         data = self.request.recv(1024)
         print(f"Received from {self.client_address[0]}:")
