@@ -10,7 +10,7 @@ MSGS_METHODS = [ServerMethods.SEND_MESSAGE, ServerMethods.RECEIVE_MESSAGES]
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
-    auth_dbhandler = DBHandler('path')
+    auth_dbhandler = DBHandler()
 
     def handle(self):
         data = self.request.recv(1024)
