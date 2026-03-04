@@ -12,7 +12,7 @@ class ServerAuth:
     def log_in(self, request_data: Dict[str, str]) -> LogInResponse:
         request = Login(**request_data)
         hashed_password = hash(request.password)
-        user = self.db.query({'email': request.email, 'password': hashed_password})
+        user = self.db.query('users', {'email': request.email})
         if user:
             cookie = CookieHandler.sign(request.email + str(hashed_password))
             response_data = {'status': True, 'message': 'logged in successfully', 'cookie': cookie}
@@ -26,8 +26,8 @@ class ServerAuth:
     def sign_up(self, request_data: Dict[str, str]) -> GenericResponse:
         request = SignUp(**request_data)
         hashed_password = hash(request.password)
-        if not self.db.write({'email': request.email}):
-            self.db.write({'email': request.email, 'password': hashed_password, 'name': request.name})
+        if not self.db.query('users', {'email': request.email}):
+            self.db.write('users', {'email': request.email, 'password': hashed_password, 'name': request.name})
             response_data = {'status': True, 'message': 'successfully signed up'}
             response = GenericResponse(**response_data)
         else:

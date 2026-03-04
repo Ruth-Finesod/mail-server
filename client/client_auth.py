@@ -23,8 +23,9 @@ class ClientAuth:
     def send_log_in(self):
         request_data = {'email': self.email, 'password': self.password}
         request_body = Login(**request_data)
-        request = {ServerMethods.LOG_IN: request_body.model_dump()}
-        response = GenericResponse(**send(request))
+        request = {ServerMethods.LOG_IN.value: request_body.model_dump()}
+        response = send(request)
+        response = GenericResponse(**response)
         if response.status:
             self.cookie = response.message
         else:
@@ -36,14 +37,15 @@ class ClientAuth:
         name = input('full name: ')
         self.password = input('password: ')
         repeat_password = input('repeat password: ')
-        if not self.password_validation(repeat_password):
+        if self.password_validation(repeat_password):
             self.send_sign_up(name)
 
     def send_sign_up(self, name):
         request_data = {'email': self.email, 'name': name, 'password': self.password}
         request_body = SignUp(**request_data)
-        request = {ServerMethods.SIGN_UP: request_body.model_dump()}
-        response = GenericResponse(**send(request))
+        request = {ServerMethods.SIGN_UP.value: request_body.model_dump()}
+        response = send(request)
+        response = GenericResponse(**response)
         print(response.message)
         if response.status:
             self.send_log_in()

@@ -5,25 +5,25 @@ from server_auth import ServerAuth
 from DBHandler import DBHandler
 
 HOST, PORT = "localhost", 9999
-AUTH_METHODS = [ServerMethods.LOG_IN, ServerMethods.SIGN_UP]
-MSGS_METHODS = [ServerMethods.SEND_MESSAGE, ServerMethods.RECEIVE_MESSAGES]
+AUTH_METHODS = [ServerMethods.LOG_IN.value, ServerMethods.SIGN_UP.value]
+MSGS_METHODS = [ServerMethods.SEND_MESSAGE.value, ServerMethods.RECEIVE_MESSAGES.value]
 
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
-    auth_dbhandler = DBHandler('path')
+    dbhandler = DBHandler()
 
     def handle(self):
         data = self.request.recv(1024)
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
-        if request_type in AUTH_METHODS:
-            a = ServerAuth(self.auth_dbhandler)
-            if request_type == ServerMethods.LOG_IN:
+        if int(request_type) in AUTH_METHODS:
+            a = ServerAuth(self.dbhandler)
+            if int(request_type) == ServerMethods.LOG_IN.value:
                 response = a.log_in(request_body)
-            elif request_type == ServerMethods.SIGN_UP:
+            elif int(request_type) == ServerMethods.SIGN_UP.value:
                 response = a.sign_up(request_body)
-        response = json.dumps(response)
-        self.request.sendall(response)
+        response = json.dumps(response.model_dump())
+        self.request.sendall(bytes(response, "utf-8"))
 
 
 if __name__ == "__main__":
