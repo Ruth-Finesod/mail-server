@@ -1,7 +1,7 @@
 from DBHandler import DBHandler
 from communication_objects import Login, SignUp, GenericResponse, LogInResponse
 from cookie_handler import CookieHandler
-import json
+from hashlib import sha256
 from typing import Dict
 
 
@@ -11,7 +11,7 @@ class ServerAuth:
     @classmethod
     def log_in(cls, request_data: Dict[str, str]) -> LogInResponse:
         request = Login(**request_data)
-        hashed_password = str(hash(request.password))
+        hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
         user = cls.db.query('users', {'email': request.email, 'password': hashed_password})
         if user:
             cookie = CookieHandler.sign(request.email + str(hashed_password))
@@ -26,7 +26,7 @@ class ServerAuth:
     @classmethod
     def sign_up(cls, request_data: Dict[str, str]) -> GenericResponse:
         request = SignUp(**request_data)
-        hashed_password = str(hash(request.password))
+        hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
         if not cls.db.query('users', {'email': request.email}):
             cls.db.write('users', {'email': request.email, 'password': hashed_password, 'name': request.name})
             response_data = {'status': True, 'message': 'successfully signed up'}

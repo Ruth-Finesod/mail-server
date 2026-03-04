@@ -106,6 +106,18 @@
     </recent_temporary>
   </component>
   <component name="TaskManager">
+<<<<<<< HEAD
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="91914d0d-a06b-40c7-920d-74a67de8f756" name="Changes" comment="" />
+      <created>1772372811042</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1772372811042</updated>
+      <workItem from="1772372814005" duration="10048000" />
+      <workItem from="1772439965846" duration="12137000" />
+    </task>
+=======
+>>>>>>> 6359de961370b0c0a9dfb7a436590736e158f930
     <servers />
   </component>
   <component name="XDebuggerManager">
