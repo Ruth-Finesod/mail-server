@@ -25,6 +25,7 @@ class GetMsg(BaseModel):
     email: str
     password: str
     cookie: str
+    read: bool
 
 
 class GenericResponse(BaseModel):
@@ -39,6 +40,12 @@ class LogInResponse(BaseModel):
 
 
 class MsgResponse(BaseModel):
+    uid: int
     sender_email: str
     subject: str
     msg: str
+    replied_to: int
+
+
+class ReadMsg(BaseModel):
+    msg_uid: int
