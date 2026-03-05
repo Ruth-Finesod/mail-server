@@ -16,6 +16,7 @@ class ClientAuth(BaseClass):
         self.cookie = ''
         self.pick_method()
 
+    @property
     def _body_request(self):
         return {'email': self.email, 'password': self.password}
 
@@ -25,7 +26,7 @@ class ClientAuth(BaseClass):
         """
         self.email = input('email address: ')
         self.password = input('password: ')
-        self.send_log_in(self._body_request())
+        self.send_log_in(self._body_request)
 
     def send_log_in(self, request_data):
         """
@@ -52,7 +53,7 @@ class ClientAuth(BaseClass):
         self.password = input('password: ')
         repeat_password = input('repeat password: ')
         if self.password_validation(repeat_password):
-            self.send_sign_up(full_name, self._body_request())
+            self.send_sign_up(full_name, self._body_request)
         else:
             self.sign_up()
 
@@ -68,7 +69,7 @@ class ClientAuth(BaseClass):
         response = GenericResponse(**response)
         print(response.message)
         if response.status:
-            self.send_log_in(self._body_request())
+            self.send_log_in(self._body_request)
         else:
             self.sign_up()
 

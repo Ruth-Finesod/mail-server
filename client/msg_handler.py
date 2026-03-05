@@ -16,6 +16,7 @@ class MsgHandler(BaseClass):
         self.user = user
         self.pick_method()
 
+    @property
     def _user_parms(self):
         return {'email': self.user.email, 'password': self.user.password, 'cookie': self.user.cookie}
 
@@ -28,7 +29,7 @@ class MsgHandler(BaseClass):
         subject = input("subject of the message: ")
         message = input("message: ")
         msg = {'receiver_email': receiver, 'subject': subject, 'msg': message}
-        body_request = SendMsg(**self._user_parms(), **msg)
+        body_request = SendMsg(**self._user_parms, **msg)
         request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
         response = send(request)
         response = GenericResponse(**response)
@@ -39,7 +40,7 @@ class MsgHandler(BaseClass):
         request to receive messages from server in GetMsg format
         receive list of messages as MsgResponse object and print
         """
-        body_request = GetMsg(**self._user_parms())
+        body_request = GetMsg(**self._user_parms)
         request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         for msg in response:

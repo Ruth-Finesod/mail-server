@@ -81,7 +81,3 @@ class DBHandler:
         self.cur.execute(
             f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
-
-    def close(self):
-        """closes the connection to the db"""
-        self.con.close()
