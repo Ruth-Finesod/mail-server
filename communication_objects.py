@@ -19,6 +19,7 @@ class SendMsg(BaseModel):
     receiver_email: str
     subject: str
     msg: str
+    reply_to: int
 
 
 class GetMsg(BaseModel):
@@ -48,4 +49,4 @@ class MsgResponse(BaseModel):
 
 
 class ReadMsg(BaseModel):
-    msg_uid: int
+    uid: int
