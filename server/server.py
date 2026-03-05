@@ -10,7 +10,8 @@ HOST, PORT = "localhost", 9999
 METHODS = {
     ServerMethods.LOG_IN.value: ServerAuth.log_in,
     ServerMethods.SIGN_UP.value: ServerAuth.sign_up,
-    ServerMethods.SEND_MESSAGE.value: ServerMsgs.send_msg
+    ServerMethods.SEND_MESSAGE.value: ServerMsgs.send_msg,
+    ServerMethods.RECEIVE_MESSAGES.value: ServerMsgs.get_msgs
 }
 
 
@@ -21,7 +22,11 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
-        response = json.dumps(response.model_dump())
+        if type(response) == list:
+            response = [i.model_dump() for i in response]
+            response = json.dumps(response)
+        else:
+            response = json.dumps(response.model_dump())
         self.request.sendall(bytes(response, "utf-8"))
 
 

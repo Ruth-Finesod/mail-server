@@ -24,15 +24,14 @@ class MsgHandler:
 
     def receive_message(self):
         body_request = GetMsg(email=self.user.email, password=self.user.password, cookie=self.user.cookie)
-        request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
+        request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         for msg in response:
-            msg = MsgResponse(msg)
+            msg = MsgResponse(**msg)
             print('new message')
             print(f'from: {msg.sender_email}')
             print(f'subject: {msg.subject}')
             print(f'message: {msg.msg}\n')
-
 
     def pick_method(self):
         print('what do you like to you do?')
@@ -44,4 +43,5 @@ class MsgHandler:
         else:
             print('you must pick one of the presented options')
             self.pick_method()
+
 

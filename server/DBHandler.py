@@ -40,9 +40,15 @@ class DBHandler:
         self.varify_keys(table_name, q.keys())
         query = SELECT.replace('table', table_name)
         item = q.popitem()
-        query += f"WHERE {item[0]}='{item[1]}'"
+        if type(item[1]) == str:
+            query += f"WHERE {item[0]}='{item[1]}'"
+        else:
+            query += f"WHERE {item[0]}={item[1]}"
         for key, item in q.items():
-            query += f"AND {key}='{item}'"
+            if type(item[1]) == str:
+                query += f"AND {key}='{item}'"
+            else:
+                query += f"AND {key}={item}"
         self.cur.execute(query)
         return self.cur.fetchall()
 
@@ -58,11 +64,13 @@ class DBHandler:
         self.varify_keys(table_name, row.keys())
         row['uid'] = self.get_uid(table_name)
         print(row)
-        self.cur.execute(f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
+        self.cur.execute(
+            f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
 
     def close(self):
         self.con.close()
+
 
 class NoSuchColumnError(Exception):
     pass
