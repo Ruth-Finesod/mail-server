@@ -79,3 +79,6 @@ class DBHandler:
         self.cur.execute(
             f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
+        
+
+

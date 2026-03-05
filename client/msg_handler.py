@@ -44,18 +44,19 @@ class MsgHandler(BaseClass):
         request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         print('\n')
-        if response:
-            for i, msg in enumerate(response):
-                msg = MsgResponse(**msg)
+        for i, msg in enumerate(response):
+            if msg:
+                msg = MsgResponse(**msg[0])
                 print(f'{i + 1}. from: {msg.sender_email} subject: {msg.subject}')
-            while True:
-                msg_num = input("q: to return to main\nenter number of messages to read: ")
-                if msg_num == 'q':
-                    return
-                else:
-                    self.read_msg(response[int(msg_num) - 1])
-        else:
-            print('no messages\n')
+            else:
+                print('no messages\n')
+                return
+        while True:
+            msg_num = input("q: to return to main\nenter number of messages to read: ")
+            if msg_num == 'q':
+                return
+            else:
+                self.read_msg(response[int(msg_num) - 1])
 
     def print_msg(self, msg):
         send({ServerMethods.READ_MSG.value: ReadMsg(uid=msg.uid)})
@@ -64,7 +65,7 @@ class MsgHandler(BaseClass):
         print(f'message: {msg.msg}\n')
 
     def read_msg(self, msg):
-        if not isinstance(msg, list):
+        if len(msg) == 1:
             self.print_msg(msg)
         else:
             for i, inner_msg in enumerate(msg):
