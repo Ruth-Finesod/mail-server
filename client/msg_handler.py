@@ -18,7 +18,7 @@ class MsgHandler(BaseClass):
 
     @property
     def _user_parms(self):
-        return {'email': self.user.email, 'password': self.user.password, 'cookie': self.user.cookie}
+        return {'email': self.user.email, 'password': self.user.password, 'cookie': self.user.cookie, 'read': False}
 
     def send_message(self, reply_to=None):
         """
