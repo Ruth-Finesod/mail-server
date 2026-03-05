@@ -13,11 +13,11 @@ class ServerMsgs:
     @classmethod
     def send_msg(cls, request_data: Dict[str, str]) -> GenericResponse:
         request = SendMsg(**request_data)
-        hashed_password = sha256(bytes(request.sender_password, 'utf-8')).hexdigest()
-        if not CookieHandler.verify(request.sender_email + hashed_password, request.cookie):
+        hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
+        if not CookieHandler.verify(request.email + hashed_password, request.cookie):
             response_data = {'status': False, 'message': 'you are unauthorized'}
             return GenericResponse(**response_data)
-        sender = cls.db.query('users', {'email': request.sender_email})
+        sender = cls.db.query('users', {'email': request.email})
         receiver = cls.db.query('users', {'email': request.receiver_email})
         if receiver:
             cls.db.write('msgs',

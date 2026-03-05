@@ -1,29 +1,45 @@
+from base_client_class import BaseClass
 from client.client_auth import ClientAuth
+from client_send import send
 from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse
 from server_methods import ServerMethods
-from client_send import send
 
 
-class MsgHandler:
+class MsgHandler(BaseClass):
+    CHOICES = {
+        'q': 'quit_app',
+        's': 'send_message',
+        'r': 'receive_messages',
+    }
+
     def __init__(self, user: ClientAuth):
         self.user = user
         self.pick_method()
 
+    def _user_parms(self):
+        return {'email': self.user.email, 'password': self.user.password, 'cookie': self.user.cookie}
 
     def send_message(self):
+        """
+        send message to the server in SendMsg format
+        receive response as GenericResponse and print
+        """
         receiver = input("send message to: ")
         subject = input("subject of the message: ")
         message = input("message: ")
-        msg = {'sender_email': self.user.email, 'sender_password': self.user.password, 'cookie': self.user.cookie,
-                      'receiver_email': receiver, 'subject': subject, 'msg': message}
-        body_request = SendMsg(**msg)
+        msg = {'receiver_email': receiver, 'subject': subject, 'msg': message}
+        body_request = SendMsg(**self._user_parms(), **msg)
         request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
         response = send(request)
         response = GenericResponse(**response)
         print(response.message)
 
-    def receive_message(self):
-        body_request = GetMsg(email=self.user.email, password=self.user.password, cookie=self.user.cookie)
+    def receive_messages(self):
+        """
+        request to receive messages from server in GetMsg format
+        receive list of messages as MsgResponse object and print
+        """
+        body_request = GetMsg(**self._user_parms())
         request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         for msg in response:
@@ -33,15 +49,6 @@ class MsgHandler:
             print(f'subject: {msg.subject}')
             print(f'message: {msg.msg}\n')
 
-    def pick_method(self):
-        print('what do you like to you do?')
-        choices = {'s': self.send_message, 'r': self.receive_message}
-        choice = input('s: send message\nr: receive messages\nyour choice: ')
-        picked_method = choices.get(choice)
-        if picked_method:
-            picked_method()
-        else:
-            print('you must pick one of the presented options')
-            self.pick_method()
-
-
+    @staticmethod
+    def quit_app():
+        quit()
