@@ -52,12 +52,12 @@ class MsgHandler(BaseClass):
         for i, msg in enumerate(response):
             if msg:
                 msg = MsgResponse(**msg[0])
-                print(f'{i + 1}. from: {msg.sender_email} subject: {msg.subject}')
+                print(f'{i + 1}. from: {msg.sender_email} | subject: {msg.subject}')
             else:
                 print('no messages\n')
                 return
         while True:
-            msg_num = input("q: to return to main\nenter number of messages to read: ")
+            msg_num = input("q: to return to main\nenter number of the message to read: ")
             if msg_num == 'q':
                 return
             else:
@@ -65,18 +65,25 @@ class MsgHandler(BaseClass):
                     msg_num = input('you must choose from the messages above: ')
                 self.read_msg(response[int(msg_num) - 1])
 
-    @staticmethod
-    def print_msg(msg):
-        send({ServerMethods.READ_MSG.value: ReadMsg(uid=msg.uid)})
+    def print_msg(self, msg):
+        send({ServerMethods.READ_MSG.value: ReadMsg(uid=msg.uid).model_dump()})
         print(f'from: {msg.sender_email}')
         print(f'subject: {msg.subject}')
         print(f'message: {msg.msg}\n')
 
     def read_msg(self, msg):
         if len(msg) == 1:
+            msg = MsgResponse(**msg[0])
             self.print_msg(msg)
+            next_method = input('q: to return to messages manu\nr: to reply to message\n ')
+            if next_method == 'q':
+                return
+            if next_method == 'r':
+                print(f'replying to {msg.sender_email}')
+                self.send_message(reply_to=msg.uid)
         else:
             for i, inner_msg in enumerate(msg):
+                inner_msg = MsgResponse(**inner_msg)
                 print(f'{i + 1}')
                 self.print_msg(inner_msg)
             next_method = input('q: to return to messages manu\nr: to reply to message\nyour choice: ')

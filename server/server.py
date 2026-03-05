@@ -24,7 +24,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
         if type(response) == list:
-            response = [i.model_dump() for i in response]
+            response = [[i.model_dump() for i in conv] for conv in response]
             response = json.dumps(response)
         else:
             response = json.dumps(response.model_dump())

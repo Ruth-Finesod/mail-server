@@ -7,12 +7,10 @@ SELECT = """SELECT *
 FROM table
 """
 
-INSERT = """
-INSERT INTO table 
+INSERT = """INSERT INTO table 
 """
 
-UPDATE = """
-UPDATE table
+UPDATE = """UPDATE table
 """
 
 MAX = """
@@ -20,7 +18,7 @@ SELECT MAX(column)
 FROM table
 """
 
-MSGS_COLUMNS = ['sender_uid', 'receiver_uid', 'subject', 'message', 'read', 'conv_uid']
+MSGS_COLUMNS = ['uid', 'sender_uid', 'receiver_uid', 'subject', 'message', 'read', 'conv_uid']
 USERS_COLUMNS = ['uid', 'email', 'name', 'password']
 
 
@@ -62,15 +60,15 @@ class DBHandler:
             item = filters.popitem()
             query += f"WHERE {item[0]}={repr(item[1])}"
         for key, value in filters.items():
-            query += f"AND {key}={repr(value)}"
+            query += f" AND {key}={repr(value)}"
         self.cur.execute(query)
         return self.cur.fetchall()
 
     def get_max(self, column, table_name: str):
         """gets the next uid in table table_name"""
-        self.cur.execute(MAX.replace('table', table_name).replace('column', column))
-        max_uid = self.cur.fetchone()
-        if max_uid[0]:
+        if self.query('msgs', {}):
+            self.cur.execute(MAX.replace('table', table_name).replace('column', column))
+            max_uid = self.cur.fetchone()
             return max_uid[0] + 1
         else:
             return 1
@@ -100,6 +98,6 @@ class DBHandler:
             item = filters.popitem()
             query += f"\nWHERE {item[0]}={repr(item[1])}"
         for key, value in filters.items():
-            query += f"AND {key}={repr(value)}"
+            query += f" AND {key}={repr(value)}"
         self.cur.execute(query)
         self.con.commit()
