@@ -10,7 +10,8 @@ METHODS = {
     ServerMethods.LOG_IN.value: ServerAuth.log_in,
     ServerMethods.SIGN_UP.value: ServerAuth.sign_up,
     ServerMethods.SEND_MESSAGE.value: ServerMsgs.send_msg,
-    ServerMethods.RECEIVE_MESSAGES.value: ServerMsgs.get_msgs
+    ServerMethods.RECEIVE_MESSAGES.value: ServerMsgs.get_msgs,
+    ServerMethods.READ_MSG.value: ServerMsgs.read_msg
 }
 
 
