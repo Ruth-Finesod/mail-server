@@ -568,7 +568,7 @@
     </routine>
     <schema id="214" parent="1" name="main">
       <Current>1</Current>
-      <LastIntrospectionLocalTimestamp>2026-03-05.14:33:11</LastIntrospectionLocalTimestamp>
+      <LastIntrospectionLocalTimestamp>2026-03-05.14:33:58</LastIntrospectionLocalTimestamp>
     </schema>
     <argument id="215" parent="14">
       <ArgumentDirection>R</ArgumentDirection>
@@ -1829,36 +1829,39 @@
     <column id="635" parent="627" name="conv_uid">
       <Position>6</Position>
     </column>
-    <column id="636" parent="628" name="type">
+    <column id="636" parent="627" name="read">
+      <Position>7</Position>
+    </column>
+    <column id="637" parent="628" name="type">
       <Position>1</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="637" parent="628" name="name">
+    <column id="638" parent="628" name="name">
       <Position>2</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="638" parent="628" name="tbl_name">
+    <column id="639" parent="628" name="tbl_name">
       <Position>3</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="639" parent="628" name="rootpage">
+    <column id="640" parent="628" name="rootpage">
       <Position>4</Position>
       <StoredType>INT|0s</StoredType>
     </column>
-    <column id="640" parent="628" name="sql">
+    <column id="641" parent="628" name="sql">
       <Position>5</Position>
       <StoredType>TEXT|0s</StoredType>
     </column>
-    <column id="641" parent="629" name="uid">
+    <column id="642" parent="629" name="uid">
       <Position>1</Position>
     </column>
-    <column id="642" parent="629" name="email">
+    <column id="643" parent="629" name="email">
       <Position>2</Position>
     </column>
-    <column id="643" parent="629" name="name">
+    <column id="644" parent="629" name="name">
       <Position>3</Position>
     </column>
-    <column id="644" parent="629" name="password">
+    <column id="645" parent="629" name="password">
       <Position>4</Position>
     </column>
   </database-model>

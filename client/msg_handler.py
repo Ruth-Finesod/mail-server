@@ -20,7 +20,7 @@ class MsgHandler(BaseClass):
     def _user_parms(self):
         return {'email': self.user.email, 'password': self.user.password, 'cookie': self.user.cookie, 'read': False}
 
-    def send_message(self, reply_to=None):
+    def send_message(self, reply_to=0):
         """
         send message to the server in SendMsg format
         receive response as GenericResponse and print
@@ -40,7 +40,11 @@ class MsgHandler(BaseClass):
         request to receive messages from server in GetMsg format
         receive list of messages as MsgResponse object and print
         """
-        body_request = GetMsg(**self._user_parms)
+        receive_options = {'n': False, 'a':True}
+        new_or_all = input('n: receive only new messages\n a: receive all messages')
+        while new_or_all not in receive_options:
+            new_or_all= input('you must choose from the options above: ')
+        body_request = GetMsg(**self._user_parms, read=receive_options[new_or_all])
         request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
         print('\n')
