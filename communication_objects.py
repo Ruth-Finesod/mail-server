@@ -4,7 +4,7 @@ from pydantic import BaseModel
 class SignUp(BaseModel):
     email: str
     password: str
-    name: str
+    full_name: str
 
 
 class Login(BaseModel):
@@ -13,8 +13,8 @@ class Login(BaseModel):
 
 
 class SendMsg(BaseModel):
-    sender_email: str
-    sender_password: str
+    email: str
+    password: str
     cookie: str
     receiver_email: str
     subject: str

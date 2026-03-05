@@ -28,7 +28,7 @@ class ServerAuth:
         request = SignUp(**request_data)
         hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
         if not cls.db.query('users', {'email': request.email}):
-            cls.db.write('users', {'email': request.email, 'password': hashed_password, 'name': request.name})
+            cls.db.write('users', {'email': request.email, 'password': hashed_password, 'name': request.full_name})
             response_data = {'status': True, 'message': 'successfully signed up'}
             response = GenericResponse(**response_data)
         else:
