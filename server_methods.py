@@ -6,3 +6,4 @@ class ServerMethods(Enum):
     SIGN_UP = 2
     SEND_MESSAGE = 3
     RECEIVE_MESSAGES = 4
+    READ_MSG = 5
