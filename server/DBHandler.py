@@ -11,6 +11,10 @@ INSERT = """
 INSERT INTO table 
 """
 
+UPDATE = """
+UPDATE table
+"""
+
 MAX = """
 SELECT MAX(column)
 FROM table
@@ -62,9 +66,9 @@ class DBHandler:
         self.cur.execute(query)
         return self.cur.fetchall()
 
-    def get_max(self, coulmn, table_name):
+    def get_uid(self, table_name):
         """gets the next uid in table table_name"""
-        self.cur.execute(MAX.replace('table', table_name).replace('column', coulmn))
+        self.cur.execute(MAX.replace('table', table_name))
         max_uid = self.cur.fetchone()
         if max_uid[0]:
             return max_uid[0] + 1
@@ -74,11 +78,8 @@ class DBHandler:
     def write(self, table_name, row: Dict[str, Any]):
         """writes a new row to table_name. the row given in the format of {column: value}"""
         self.verify_keys(table_name, list(row.keys()))
-        row['uid'] = self.get_max('uid', table_name)
+        row['uid'] = self.get_uid(table_name)
         print(row)
         self.cur.execute(
             f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
-        
-
-

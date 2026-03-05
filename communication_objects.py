@@ -45,7 +45,6 @@ class MsgResponse(BaseModel):
     sender_email: str
     subject: str
     msg: str
-    replied_to: int
 
 
 class ReadMsg(BaseModel):
