@@ -1,10 +1,9 @@
 import json
 import socketserver
 
-from DBHandler import DBHandler
 from server_auth import ServerAuth
-from server_msgs import ServerMsgs
 from server_methods import ServerMethods
+from server_msgs import ServerMsgs
 
 HOST, PORT = "localhost", 9999
 METHODS = {
@@ -18,6 +17,7 @@ METHODS = {
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
+        """receives data from the client, put in the correct method, and sends the response"""
         data = self.request.recv(1024)
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
