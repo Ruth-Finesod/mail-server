@@ -56,11 +56,9 @@ class DBHandler:
         query = SELECT.replace('table', table_name)
         if filters:
             item = filters.popitem()
-            value = "'" + item[1] + "'" if type(item[1]) is str else item[1]
-            query += f"WHERE {item[0]}={value}"
+            query += f"WHERE {item[0]}={repr(item[1])}"
         for key, value in filters.items():
-            value = "'" + value + "'" if type(value) is str else value
-            query += f"AND {key}={value}"
+            query += f"AND {key}={repr(value)}"
         self.cur.execute(query)
         return self.cur.fetchall()
 
