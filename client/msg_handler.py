@@ -42,12 +42,16 @@ class MsgHandler(BaseClass):
         body_request = GetMsg(**self._user_parms())
         request = {ServerMethods.RECEIVE_MESSAGES.value: body_request.model_dump()}
         response = send(request)
-        for msg in response:
-            msg = MsgResponse(**msg)
-            print('new message')
-            print(f'from: {msg.sender_email}')
-            print(f'subject: {msg.subject}')
-            print(f'message: {msg.msg}\n')
+        print('\n')
+        if response:
+            for msg in response:
+                msg = MsgResponse(**msg)
+                print('new message')
+                print(f'from: {msg.sender_email}')
+                print(f'subject: {msg.subject}')
+                print(f'message: {msg.msg}\n')
+        else:
+            print('no messages\n')
 
     @staticmethod
     def quit_app():
