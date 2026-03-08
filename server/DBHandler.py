@@ -20,6 +20,7 @@ FROM table
 
 MSGS_COLUMNS = ['uid', 'sender_uid', 'receiver_uid', 'subject', 'message', 'read', 'conv_uid']
 USERS_COLUMNS = ['uid', 'email', 'name', 'password']
+ATTACHMENTS_COLUMNS = ['uid', 'file_name', 'data', 'msg_uid']
 
 
 class NoSuchColumnError(Exception):
@@ -41,6 +42,8 @@ class DBHandler:
             columns = USERS_COLUMNS
         elif table_name == 'msgs':
             columns = MSGS_COLUMNS
+        elif table_name == 'attachments':
+            columns = ATTACHMENTS_COLUMNS
         else:
             raise NoSuchTableError('the requested table does not exist')
         for key in keys:
@@ -73,7 +76,7 @@ class DBHandler:
         else:
             return 1
 
-    def write(self, table_name: str, row: Dict[str, Any]):
+    def write(self, table_name: str, row: Dict[str, Any]) -> int:
         """writes a new row to table_name. the row given in the format of {column: value}"""
         self.verify_keys(table_name, list(row.keys()))
         row['uid'] = self.get_max('uid', table_name)
@@ -81,6 +84,7 @@ class DBHandler:
         self.cur.execute(
             f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
         self.con.commit()
+        return row['uid']
 
     def update(self, table_name: str, filters: Dict[str, Any], change: Dict[str, Any]):
         """writes a new row to table_name. the row given in the format of {column: value}"""
