@@ -29,7 +29,7 @@ class ServerMsgs:
             message_data = {'sender_uid': sender[0], 'receiver_uid': receiver[0], 'subject': request.subject,
                             'message': request.msg, 'read': False}
             if request.reply_to:
-                replied_to = cls.db.query(cls.USERS_TABLE, {'uid': request.reply_to})[0]
+                replied_to = cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0]
                 message_data['conv_uid'] = replied_to[5]
             else:
                 message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.USERS_TABLE)
