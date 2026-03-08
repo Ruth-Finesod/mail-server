@@ -5,7 +5,7 @@ from server_methods import ServerMethods
 
 
 class ClientAuth(BaseClass):
-    CHOICES = {
+    MAIN_CHOICES = {
         'l': 'log_in',
         's': 'sign_up'
     }
@@ -14,7 +14,7 @@ class ClientAuth(BaseClass):
         self.email = ''
         self.password = ''
         self.cookie = ''
-        self.pick_method()
+        self.pick_method(self.MAIN_CHOICES)
 
     @property
     def _body_request(self):
