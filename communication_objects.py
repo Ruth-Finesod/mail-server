@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import List, Dict, Any
 
 
 class SignUp(BaseModel):
@@ -12,6 +13,11 @@ class Login(BaseModel):
     password: str
 
 
+class Attachment(BaseModel):
+    file_name: str
+    file_data: bytes
+
+
 class SendMsg(BaseModel):
     email: str
     password: str
@@ -20,6 +26,7 @@ class SendMsg(BaseModel):
     subject: str
     msg: str
     reply_to: int
+    attachments: List[Dict[str, Any]]
 
 
 class GetMsg(BaseModel):
@@ -45,6 +52,7 @@ class MsgResponse(BaseModel):
     sender_email: str
     subject: str
     msg: str
+    attachments: List[Dict[str, Any]]
 
 
 class ReadMsg(BaseModel):
