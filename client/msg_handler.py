@@ -42,7 +42,7 @@ class MsgHandler(BaseClass):
         receive list of messages as MsgResponse object and print
         """
         receive_options = {'n': False, 'a': True}
-        new_or_all = input('n: receive only new messages\n a: receive all messages\nyour choice: ')
+        new_or_all = input('n: receive only new messages\na: receive all messages\nyour choice: ')
         while new_or_all not in receive_options:
             new_or_all = input('you must choose from the options above: ')
         body_request = GetMsg(**self._user_parms, read=receive_options[new_or_all])
@@ -72,34 +72,16 @@ class MsgHandler(BaseClass):
         print(f'message: {msg.msg}\n')
 
     def read_msg(self, msg):
-        if len(msg) == 1:
-            msg = MsgResponse(**msg[0])
-            self.print_msg(msg)
-            next_method = input('q: to return to messages manu\nr: to reply to message\n ')
-            if next_method == 'q':
-                return
-            if next_method == 'r':
-                print(f'replying to {msg.sender_email}')
-                self.send_message(reply_to=msg.uid)
-        else:
-            for i, inner_msg in enumerate(msg):
-                inner_msg = MsgResponse(**inner_msg)
-                print(f'{i + 1}')
-                self.print_msg(inner_msg)
-            next_method = input('q: to return to messages manu\nr: to reply to message\nyour choice: ')
-            if next_method == 'q':
-                return
-            if next_method == 'r':
-                msg_num = int(input("enter number of the message to reply to: "))
-                msg = msg[msg_num - 1]
-                self.send_message(reply_to=msg.uid, receiver=msg.sender_email, subject=f're: {msg.subject}')
-
+        msg = msg if type(msg) is list else [msg]
+        for inner_msg in msg:
+            inner_msg = MsgResponse(**inner_msg)
+            self.print_msg(inner_msg)
+        msg = inner_msg
         next_method = input('q: to return to messages manu\nr: to reply to message\nyour choice: ')
         if next_method == 'q':
             return
         if next_method == 'r':
-            print(f'replying to {msg.sender_email}')
-            self.send_message(reply_to=msg.uid, receiver=msg.sender_email, subject=f're: {msg.subject}')
+            self.send_message(reply_to=msg.uid, receiver=msg.sender_email, subject=msg.subject)
 
     @staticmethod
     def quit_app():
