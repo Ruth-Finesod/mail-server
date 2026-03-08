@@ -110,7 +110,7 @@ class MsgHandler(BaseClass):
             with open(file_path, 'rb') as f:
                 file_data = f.read()
             file_name = os.path.basename(file_path)
-        attachments.append({'file_name': file_name, 'file_data': file_data})
+            attachments.append({'file_name': file_name, 'file_data': file_data})
         return attachments
 
     @staticmethod
