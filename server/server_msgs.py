@@ -1,16 +1,16 @@
-from typing import Dict
-from typing import List
+from collections import defaultdict
+from typing import List, Any, Dict, Tuple
 
 from DBHandler import DBHandler
-from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse, ReadMsg
+from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse, ReadMsg, Attachment
 from cookie_handler import CookieHandler
-from collections import defaultdict
 
 
 class ServerMsgs:
     db = DBHandler()
     USERS_TABLE = 'users'
     MSGS_TABLE = 'msgs'
+    ATTACHMENTS_TABLE = 'attachments'
 
     @classmethod
     def send_msg(cls, request_data: Dict[str, str]) -> GenericResponse:
@@ -33,10 +33,11 @@ class ServerMsgs:
                 message_data['conv_uid'] = replied_to[5]
             else:
                 message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.USERS_TABLE)
-            cls.db.write(cls.MSGS_TABLE, message_data)
+            msg_uid = cls.db.write(cls.MSGS_TABLE, message_data)
+            cls.send_attachments(msg_uid, request.attachments)
             response_data = {'status': True, 'message': 'sent message'}
-            return GenericResponse(**response_data)
-        response_data = {'status': False, 'message': 'receiver email does not exist'}
+        else:
+            response_data = {'status': False, 'message': 'receiver email does not exist'}
         return GenericResponse(**response_data)
 
     @classmethod
@@ -57,10 +58,28 @@ class ServerMsgs:
         conv_uids = defaultdict(list)
         for message in messages:
             sender = cls.db.query(cls.USERS_TABLE, {'uid': message[1]})[0]
-            request_data = {'uid': message[0], 'sender_email': sender[1], 'subject': message[3], 'msg': message[4]}
+            attachments = [attach.model_dump() for attach in cls.get_attachments(message[0])]
+            request_data = {'uid': message[0], 'sender_email': sender[1], 'subject': message[3], 'msg': message[4],
+                            'attachments': attachments}
             message_data = MsgResponse(**request_data)
             conv_uids[message[5]].append(message_data)
         return list(conv_uids.values())
+
+    @classmethod
+    def send_attachments(cls, msg_uid: int, attachments: List[Dict[str, Any]]):
+        for attachment in attachments:
+            attachment = Attachment(**attachment).model_dump()
+            attachment['msg_uid'] = msg_uid
+            cls.db.write(cls.ATTACHMENTS_TABLE, attachment)
+
+    @classmethod
+    def get_attachments(cls, msg_uid) -> List[Attachment]:
+        attachments = cls.db.query(cls.ATTACHMENTS_TABLE, {'msg_uid': msg_uid})
+        organized_atts = []
+        for attachment in attachments:
+            organized_att = {'file_name': attachment[1], 'file_data': attachments[2]}
+            organized_atts.append(Attachment(**organized_att))
+        return organized_atts
 
     @classmethod
     def read_msg(cls, request_data: Dict[str, str]) -> GenericResponse:

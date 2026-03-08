@@ -1,5 +1,8 @@
 import json
 import socketserver
+from typing import Any
+
+from pydantic import BaseModel
 
 from server_auth import ServerAuth
 from server_methods import ServerMethods
@@ -15,6 +18,16 @@ METHODS = {
 }
 
 
+def make_jsonable(obj: Any) -> Any:
+    if isinstance(obj, BaseModel):
+        return make_jsonable(obj.model_dump())
+    if isinstance(obj, dict):
+        return {k: make_jsonable(v) for k, v in obj.items()}
+    if isinstance(obj, (list, tuple, set)):
+        return [make_jsonable(v) for v in obj]
+    return obj
+
+
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
@@ -23,11 +36,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
-        if type(response) == list:
-            response = [[i.model_dump() for i in conv] for conv in response]
-            response = json.dumps(response)
-        else:
-            response = json.dumps(response.model_dump())
+        response = json.dumps(make_jsonable(response))
         self.request.sendall(bytes(response, "utf-8"))
 
 
