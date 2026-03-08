@@ -1,17 +1,12 @@
-import os.path
-from tkinter import filedialog, Tk
-from subprocess import Popen
-import pathlib
-
 from base_client_class import BaseClass
 from client.client_auth import ClientAuth
 from client_send import send
-from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg, Attachment
+from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg
 from server_methods import ServerMethods
 
 
 class MsgHandler(BaseClass):
-    MAIN_CHOICES = {
+    CHOICES = {
         'q': 'quit_app',
         's': 'send_message',
         'r': 'receive_messages',
@@ -19,7 +14,7 @@ class MsgHandler(BaseClass):
 
     def __init__(self, user: ClientAuth):
         self.user = user
-        self.pick_method(self.MAIN_CHOICES)
+        self.pick_method()
 
     @property
     def _user_parms(self):
@@ -34,12 +29,7 @@ class MsgHandler(BaseClass):
             receiver = input("send message to: ")
             subject = input("subject of the message: ")
         message = input("message: ")
-        attachment = input("do you want to attach files? (y/n): ")
-        while attachment not in ('y', 'n'):
-            attachment = input("do you want to attach files? (y/n): ")
-        attachments = self.attach_file() if attachment == 'y' else []
-        msg = {'receiver_email': receiver, 'subject': subject, 'msg': message, 'reply_to': reply_to,
-               'attachments': attachments}
+        msg = {'receiver_email': receiver, 'subject': subject, 'msg': message, 'reply_to': reply_to}
         body_request = SendMsg(**self._user_parms, **msg)
         request = {ServerMethods.SEND_MESSAGE.value: body_request.model_dump()}
         response = send(request)
@@ -75,51 +65,23 @@ class MsgHandler(BaseClass):
                     msg_num = input('you must choose from the messages above: ')
                 self.read_msg(response[int(msg_num) - 1])
 
-    def read_msg(self, msgs):
-        msgs = msgs if type(msgs) is list else [msgs]
-        for msg in msgs:
-            msg = MsgResponse(**msg)
-            send({ServerMethods.READ_MSG.value: ReadMsg(uid=msg.uid).model_dump()})
-            print(f'from: {msg.sender_email}')
-            print(f'subject: {msg.subject}')
-            print(f'message: {msg.msg}\n')
-            if msg.attachments:
-                print('attachments: ')
-                attachment = [Attachment(**attachment) for attachment in msg.attachments]
-                for attachment in attachment:
-                    print(attachment.file_name)
-                download = input('do you want to download attachment? (y/n): ')
-                while download not in ('y', 'n'):
-                    download = input("do you want to attach files? (y/n): ")
-                if download == 'y':
-                    self.download_attachments(msg.attachments)
+    def print_msg(self, msg):
+        send({ServerMethods.READ_MSG.value: ReadMsg(uid=msg.uid).model_dump()})
+        print(f'from: {msg.sender_email}')
+        print(f'subject: {msg.subject}')
+        print(f'message: {msg.msg}\n')
+
+    def read_msg(self, msg):
+        msg = msg if type(msg) is list else [msg]
+        for inner_msg in msg:
+            inner_msg = MsgResponse(**inner_msg)
+            self.print_msg(inner_msg)
+        msg = inner_msg
         next_method = input('q: to return to messages manu\nr: to reply to message\nyour choice: ')
-        while next_method not in ('q', 'r'):
-            next_method = input('you must choose from the options above: ')
         if next_method == 'q':
             return
         if next_method == 'r':
             self.send_message(reply_to=msg.uid, receiver=msg.sender_email, subject=msg.subject)
-
-    @staticmethod
-    def attach_file():
-        attachments = []
-        Tk().withdraw()
-        file_paths = filedialog.askopenfilenames()
-        for file_path in file_paths:
-            with open(file_path, 'rb') as f:
-                file_data = f.read()
-            file_name = os.path.basename(file_path)
-            attachments.append({'file_name': file_name, 'file_data': file_data})
-        return attachments
-
-    @staticmethod
-    def download_attachments(attachments):
-        download_path = pathlib.Path.home() / 'Downloads'
-        for attachment in attachments:
-            with open(download_path / attachment.file_name, 'wb') as f:
-                f.write(attachment.file_data)
-        Popen(f'explorer {download_path}')
 
     @staticmethod
     def quit_app():
