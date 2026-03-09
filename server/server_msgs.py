@@ -26,8 +26,9 @@ class ServerMsgs:
             response_data = {'status': False, 'message': 'you are unauthorized'}
             return GenericResponse(**response_data)
         sender = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
-        receiver = cls.db.query(cls.USERS_TABLE, {'email': request.receiver_email})[0]
+        receiver = cls.db.query(cls.USERS_TABLE, {'email': request.receiver_email})
         if receiver:
+            receiver = receiver[0]
             message_data = {'sender_uid': sender[0], 'receiver_uid': receiver[0], 'subject': request.subject,
                             'message': request.msg, 'read': False}
             if request.reply_to:
