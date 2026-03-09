@@ -72,7 +72,7 @@ class ServerMsgs:
         for attachment in attachments:
             attachment = Attachment(**attachment)
             uid = cls.db.get_max('uid', cls.ATTACHMENTS_TABLE)
-            file_data = base64.b64encode(attachment.file_data)
+            file_data = base64.b64decode(attachment.file_data)
             with open(cls.ATTACHMENTS_TABLE + '\\' + str(uid), 'wb') as f:
                 f.write(file_data)
             db_attachment = {'uid': uid, 'file_name': attachment.file_name, 'msg_uid': msg_uid}

@@ -1,9 +1,9 @@
 import json
 import socket
+import struct
 from typing import Dict, Any
 
 HOST, PORT = "localhost", 9999
-MESSAGE_END_MAGIC = b'RfSk\n'
 
 
 def send(data: Dict[int, Any]) -> Dict[str, Any]:
@@ -16,9 +16,13 @@ def send(data: Dict[int, Any]) -> Dict[str, Any]:
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         # Connect to server and send data
         sock.connect((HOST, PORT))
-        data = json.dumps(data)
-        sock.sendall(bytes(data, "utf-8") + MESSAGE_END_MAGIC)
+        data = json.dumps(data).encode("utf-8")
+        length = struct.pack(">I", len(data))
+        sock.sendall(length + data)
         # Receive data from the server and shut down
-        received = sock.recv(2000)
-        received = json.loads(received)
+        resp_len = struct.unpack(">I", sock.recv(4))[0]
+        resp_data = b''
+        while len(resp_data) != resp_len:
+            resp_data += sock.recv(resp_len - len(resp_data))
+        received = json.loads(resp_data.decode("utf-8"))
     return received

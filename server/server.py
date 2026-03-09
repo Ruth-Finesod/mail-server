@@ -1,5 +1,6 @@
 import json
 import socketserver
+import struct
 from typing import Any
 
 from pydantic import BaseModel
@@ -16,7 +17,7 @@ METHODS = {
     ServerMethods.RECEIVE_MESSAGES.value: ServerMsgs.get_msgs,
     ServerMethods.READ_MSG.value: ServerMsgs.read_msg
 }
-MESSAGE_END_MAGIC = b'RfSk\n'
+
 
 def make_jsonable(obj: Any) -> Any:
     if isinstance(obj, BaseModel):
@@ -31,17 +32,15 @@ def make_jsonable(obj: Any) -> Any:
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        pieces = [b'']
-        while not pieces[-1].endswith(MESSAGE_END_MAGIC):
-            pieces.append(self.request.recv(2000))
-        data = b''.join(pieces)
-        data = data[:-len(MESSAGE_END_MAGIC)]
+        length = struct.unpack(">I", self.request.recv(4))[0]
+        data = self.request.recv(length)
         """receives data from the client, put in the correct method, and sends the response"""
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
-        response = json.dumps(make_jsonable(response))
-        self.request.sendall(bytes(response, "utf-8"))
+        response = json.dumps(make_jsonable(response)).encode()
+        resp_len = struct.pack(">I", len(response))
+        self.request.sendall(resp_len + response)
 
 
 if __name__ == "__main__":

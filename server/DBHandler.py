@@ -69,7 +69,7 @@ class DBHandler:
 
     def get_max(self, column, table_name: str) -> int:
         """gets the next uid in table table_name"""
-        if self.query('msgs', {}):
+        if self.query(table_name, {}):
             self.cur.execute(MAX.replace('table', table_name).replace('column', column))
             max_uid = self.cur.fetchone()
             return max_uid[0] + 1
