@@ -1,9 +1,9 @@
+import base64
 from collections import defaultdict
-from typing import List, Any, Dict, Tuple
+from typing import List, Any, Dict
 
 from DBHandler import DBHandler
 from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse, ReadMsg, Attachment
-import base64
 
 
 class ServerMsgs:
@@ -83,13 +83,12 @@ class ServerMsgs:
         return organized_atts
 
     @classmethod
-    def read_msg(cls, request_data: Dict[str, str]) -> GenericResponse:
+    def read_msg(cls, request: ReadMsg) -> GenericResponse:
         """
         adds a message given in the request_data to the db
-        :param request_data: dict of strings in the format of ReadMsg (only includes the msg uid)
+        :param request: dict of strings in the format of ReadMsg (only includes the msg uid)
         :return: in the format of GenericResponse, returns the status of the action
         """
-        request = ReadMsg(**request_data)
         cls.db.update(cls.MSGS_TABLE, {'uid': request.uid}, {'read': True})
         response_data = {'status': True, 'message': 'message was read'}
         return GenericResponse(**response_data)
