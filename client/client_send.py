@@ -6,6 +6,13 @@ from typing import Dict, Any
 HOST, PORT = "localhost", 9999
 
 
+def socket_receive(sock, length: int):
+    data = b''
+    while len(data) != length:
+        data += sock.recv(length - len(data))
+    return data
+
+
 def send(data: Dict[int, Any]) -> Dict[str, Any]:
     """
     Send data to server
@@ -20,9 +27,6 @@ def send(data: Dict[int, Any]) -> Dict[str, Any]:
         length = struct.pack(">I", len(data))
         sock.sendall(length + data)
         # Receive data from the server and shut down
-        resp_len = struct.unpack(">I", sock.recv(4))[0]
-        resp_data = b''
-        while len(resp_data) != resp_len:
-            resp_data += sock.recv(resp_len - len(resp_data))
-        received = json.loads(resp_data.decode("utf-8"))
+        resp_len = struct.unpack(">I", socket_receive(sock, 4))[0]
+        received = json.loads(socket_receive(sock, resp_len).decode("utf-8"))
     return received
