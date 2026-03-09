@@ -116,12 +116,12 @@ class MsgHandler(BaseClass):
 
     @staticmethod
     def download_attachments(attachments):
-        download_path = pathlib.Path.home() / 'Downloads'
         for attachment in attachments:
             file_data = base64.b64decode(attachment.file_data)
-            with open(download_path / attachment.file_name, 'wb') as f:
+            new_file_path = pathlib.Path.home() / 'Downloads' / attachment.file_name
+            with open(new_file_path, 'wb') as f:
                 f.write(file_data)
-        Popen(f'explorer {download_path}')
+                Popen(f'explorer {new_file_path}')
 
     @staticmethod
     def quit_app():
