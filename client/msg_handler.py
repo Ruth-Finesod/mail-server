@@ -8,6 +8,7 @@ from client.client_auth import ClientAuth
 from client_send import send
 from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg, Attachment
 from server_methods import ServerMethods
+import base64
 
 
 class MsgHandler(BaseClass):
@@ -85,14 +86,14 @@ class MsgHandler(BaseClass):
             print(f'message: {msg.msg}\n')
             if msg.attachments:
                 print('attachments: ')
-                attachment = [Attachment(**attachment) for attachment in msg.attachments]
-                for attachment in attachment:
+                attachments = [Attachment(**attachment) for attachment in msg.attachments]
+                for attachment in attachments:
                     print(attachment.file_name)
                 download = input('do you want to download attachment? (y/n): ')
                 while download not in ('y', 'n'):
                     download = input("do you want to attach files? (y/n): ")
                 if download == 'y':
-                    self.download_attachments(msg.attachments)
+                    self.download_attachments(attachments)
         next_method = input('q: to return to messages manu\nr: to reply to message\nyour choice: ')
         while next_method not in ('q', 'r'):
             next_method = input('you must choose from the options above: ')
@@ -110,16 +111,17 @@ class MsgHandler(BaseClass):
             with open(file_path, 'rb') as f:
                 file_data = f.read()
             file_name = os.path.basename(file_path)
-            attachments.append({'file_name': file_name, 'file_data': file_data})
+            attachments.append({'file_name': file_name, 'file_data': base64.b64encode(file_data).decode()})
         return attachments
 
     @staticmethod
     def download_attachments(attachments):
-        download_path = pathlib.Path.home() / 'Downloads'
         for attachment in attachments:
-            with open(download_path / attachment.file_name, 'wb') as f:
-                f.write(attachment.file_data)
-        Popen(f'explorer {download_path}')
+            file_data = base64.b64decode(attachment.file_data)
+            new_file_path = pathlib.Path.home() / 'Downloads' / attachment.file_name
+            with open(new_file_path, 'wb') as f:
+                f.write(file_data)
+                Popen(f'explorer {new_file_path}')
 
     @staticmethod
     def quit_app():

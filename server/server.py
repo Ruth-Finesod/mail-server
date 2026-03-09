@@ -1,5 +1,6 @@
 import json
 import socketserver
+import struct
 from typing import Any
 
 from pydantic import BaseModel
@@ -31,13 +32,15 @@ def make_jsonable(obj: Any) -> Any:
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
+        length = struct.unpack(">I", self.request.recv(4))[0]
+        data = self.request.recv(length)
         """receives data from the client, put in the correct method, and sends the response"""
-        data = self.request.recv(1024)
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
-        response = json.dumps(make_jsonable(response))
-        self.request.sendall(bytes(response, "utf-8"))
+        response = json.dumps(make_jsonable(response)).encode()
+        resp_len = struct.pack(">I", len(response))
+        self.request.sendall(resp_len + response)
 
 
 if __name__ == "__main__":

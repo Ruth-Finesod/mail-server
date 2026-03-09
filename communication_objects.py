@@ -15,7 +15,7 @@ class Login(BaseModel):
 
 class Attachment(BaseModel):
     file_name: str
-    file_data: bytes
+    file_data: str
 
 
 class SendMsg(BaseModel):
