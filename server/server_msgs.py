@@ -3,7 +3,6 @@ from typing import List, Any, Dict, Tuple
 
 from DBHandler import DBHandler
 from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse, ReadMsg, Attachment
-from cookie_handler import CookieHandler
 import base64
 
 
@@ -15,16 +14,12 @@ class ServerMsgs:
     ATTACHMENTS_DIR = './attachments'
 
     @classmethod
-    def send_msg(cls, request_data: Dict[str, str]) -> GenericResponse:
+    def send_msg(cls, request: SendMsg) -> GenericResponse:
         """
         adds a message given in the request_data to the db
-        :param request_data: dict of strings in the format of SendMsg
+        :param request: SendMsg
         :return: in the format of GenericResponse, returns the status of the action
         """
-        request = SendMsg(**request_data)
-        if not CookieHandler.verify(request.email + request.password, request.cookie):
-            response_data = {'status': False, 'message': 'you are unauthorized'}
-            return GenericResponse(**response_data)
         sender = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
         receiver = cls.db.query(cls.USERS_TABLE, {'email': request.receiver_email})
         if receiver:
@@ -44,18 +39,15 @@ class ServerMsgs:
         return GenericResponse(**response_data)
 
     @classmethod
-    def get_msgs(cls, request_data: Dict[str, str]) -> List[List[MsgResponse]]:
+    def get_msgs(cls, request: GetMsg) -> List[List[MsgResponse]]:
         """
         fetches all the messages to a specific user
-        :param request_data: dict of strings in format of GetMsg with the information of the requested user
+        :param request: GetMsg with the information of the requested user
         :return: List of Lists of MsgResponses with the email information divided by conv uid
         """
-        request = GetMsg(**request_data)
-        if not CookieHandler.verify(request.email + request.password, request.cookie):
-            return []
         receiver = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
         messages_query = {'receiver_uid': receiver[0]}
-        if request.read is False:
+        if not request.read:
             messages_query['read'] = request.read
         messages = cls.db.query(cls.MSGS_TABLE, messages_query)
         conv_uids = defaultdict(list)
