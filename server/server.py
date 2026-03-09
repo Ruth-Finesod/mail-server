@@ -29,11 +29,18 @@ def make_jsonable(obj: Any) -> Any:
     return obj
 
 
+def socket_receive(sock, length: int):
+    data = b''
+    while len(data) != length:
+        data += sock.recv(length - len(data))
+    return data
+
+
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
-        length = struct.unpack(">I", self.request.recv(4))[0]
-        data = self.request.recv(length)
+        length = struct.unpack(">I", socket_receive(self.request, 4))[0]
+        data = socket_receive(self.request, length)
         """receives data from the client, put in the correct method, and sends the response"""
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
