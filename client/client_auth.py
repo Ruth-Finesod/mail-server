@@ -13,7 +13,6 @@ class ClientAuth(BaseClass):
     def __init__(self):
         self.email = ''
         self.password = ''
-        self.cookie = ''
         self.pick_method(self.MAIN_CHOICES)
 
     @property
@@ -32,16 +31,13 @@ class ClientAuth(BaseClass):
         """
         send log in parms to server in a Login format
         :param request_data: log in parms
-        get cookie from server
         print message from server
         """
         request = {ServerMethods.LOG_IN.value: Login(**request_data).model_dump()}
         response = send(request)
         response = LogInResponse(**response)
         print(response.message)
-        if response.status:
-            self.cookie = response.cookie
-        else:
+        if not response.status:
             self.log_in()
 
     def sign_up(self):
