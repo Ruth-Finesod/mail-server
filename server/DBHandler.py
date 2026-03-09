@@ -20,7 +20,7 @@ FROM table
 
 MSGS_COLUMNS = ['uid', 'sender_uid', 'receiver_uid', 'subject', 'message', 'read', 'conv_uid']
 USERS_COLUMNS = ['uid', 'email', 'name', 'password']
-ATTACHMENTS_COLUMNS = ['uid', 'file_name', 'data', 'msg_uid']
+ATTACHMENTS_COLUMNS = ['uid', 'file_name', 'msg_uid']
 
 
 class NoSuchColumnError(Exception):
@@ -67,7 +67,7 @@ class DBHandler:
         self.cur.execute(query)
         return self.cur.fetchall()
 
-    def get_max(self, column, table_name: str):
+    def get_max(self, column, table_name: str) -> int:
         """gets the next uid in table table_name"""
         if self.query('msgs', {}):
             self.cur.execute(MAX.replace('table', table_name).replace('column', column))
@@ -79,7 +79,8 @@ class DBHandler:
     def write(self, table_name: str, row: Dict[str, Any]) -> int:
         """writes a new row to table_name. the row given in the format of {column: value}"""
         self.verify_keys(table_name, list(row.keys()))
-        row['uid'] = self.get_max('uid', table_name)
+        if 'uid' not in row.keys():
+            row['uid'] = self.get_max('uid', table_name)
         print(row)
         self.cur.execute(
             f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")

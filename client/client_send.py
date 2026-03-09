@@ -3,6 +3,7 @@ import socket
 from typing import Dict, Any
 
 HOST, PORT = "localhost", 9999
+MESSAGE_END_MAGIC = b'RfSk\n'
 
 
 def send(data: Dict[int, Any]) -> Dict[str, Any]:
@@ -16,8 +17,8 @@ def send(data: Dict[int, Any]) -> Dict[str, Any]:
         # Connect to server and send data
         sock.connect((HOST, PORT))
         data = json.dumps(data)
-        sock.sendall(bytes(data, "utf-8"))
+        sock.sendall(bytes(data, "utf-8") + MESSAGE_END_MAGIC)
         # Receive data from the server and shut down
-        received = sock.recv(1024)
+        received = sock.recv(2000)
         received = json.loads(received)
     return received

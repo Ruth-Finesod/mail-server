@@ -8,6 +8,7 @@ from client.client_auth import ClientAuth
 from client_send import send
 from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg, Attachment
 from server_methods import ServerMethods
+import base64
 
 
 class MsgHandler(BaseClass):
@@ -110,15 +111,16 @@ class MsgHandler(BaseClass):
             with open(file_path, 'rb') as f:
                 file_data = f.read()
             file_name = os.path.basename(file_path)
-            attachments.append({'file_name': file_name, 'file_data': file_data})
+            attachments.append({'file_name': file_name, 'file_data': base64.b64encode(file_data).decode()})
         return attachments
 
     @staticmethod
     def download_attachments(attachments):
         download_path = pathlib.Path.home() / 'Downloads'
         for attachment in attachments:
+            file_data = base64.b64encode(attachment.file_data)
             with open(download_path / attachment.file_name, 'wb') as f:
-                f.write(attachment.file_data)
+                f.write(file_data)
         Popen(f'explorer {download_path}')
 
     @staticmethod

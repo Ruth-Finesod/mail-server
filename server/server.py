@@ -16,7 +16,7 @@ METHODS = {
     ServerMethods.RECEIVE_MESSAGES.value: ServerMsgs.get_msgs,
     ServerMethods.READ_MSG.value: ServerMsgs.read_msg
 }
-
+MESSAGE_END_MAGIC = b'RfSk\n'
 
 def make_jsonable(obj: Any) -> Any:
     if isinstance(obj, BaseModel):
@@ -31,8 +31,12 @@ def make_jsonable(obj: Any) -> Any:
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
+        pieces = [b'']
+        while not pieces[-1].endswith(MESSAGE_END_MAGIC):
+            pieces.append(self.request.recv(2000))
+        data = b''.join(pieces)
+        data = data[:-len(MESSAGE_END_MAGIC)]
         """receives data from the client, put in the correct method, and sends the response"""
-        data = self.request.recv(1024)
         request = json.loads(data.decode("utf-8"))
         request_type, request_body = request.popitem()
         response = METHODS[int(request_type)](request_body)
