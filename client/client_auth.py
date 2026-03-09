@@ -24,7 +24,7 @@ class ClientAuth(BaseClass):
         """
         get input for log in
         """
-        self.email = input('email address: ')
+        self.email = input('email address: ').lower()
         self.password = input('password: ')
         self.send_log_in(self._body_request)
 
@@ -48,7 +48,7 @@ class ClientAuth(BaseClass):
         """
         get input for sign up
         """
-        self.email = input('email address: ')
+        self.email = input('email address: ').lower()
         full_name = input('full name: ')
         self.password = input('password: ')
         repeat_password = input('repeat password: ')
