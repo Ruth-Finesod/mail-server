@@ -1,5 +1,6 @@
 import sqlite3
-from typing import Dict, List, Any, Tuple
+from contextlib import contextmanager
+from typing import Dict, List, Any, Tuple, Generator
 
 DB = "mail_server_db.db"
 
@@ -33,8 +34,19 @@ class NoSuchTableError(Exception):
 
 class DBHandler:
     def __init__(self):
-        self.con = sqlite3.connect(DB, check_same_thread=False)
-        self.cur = self.con.cursor()
+        self.con = None
+        self.cur = None
+
+    @contextmanager
+    def connect(self) -> Generator[Any | None, Any, None]:
+        if self.con:
+            yield self.con, self.cur
+        else:
+            self.con = sqlite3.connect(DB)
+            self.cur = self.con.cursor()
+            yield self.con, self.cur
+            self.con.close()
+            self.con, self.cur = None, None
 
     @staticmethod
     def verify_keys(table_name: str, keys: List[str]):
@@ -57,55 +69,56 @@ class DBHandler:
         :param filters: dict with the keys as columns names and values as their values
         :return: list of
         """
-        self.verify_keys(table_name, list(filters.keys()))
-        query = SELECT.replace('table', table_name)
-        if filters:
-            item = filters.popitem()
-            query += f"WHERE {item[0]}={repr(item[1])}"
-        for key, value in filters.items():
-            query += f" AND {key}={repr(value)}"
-        self.cur.execute(query)
-        return self.cur.fetchall()
+        with self.connect() as (con, cur):
+            self.verify_keys(table_name, list(filters.keys()))
+            query = SELECT.replace('table', table_name)
+            if filters:
+                item = filters.popitem()
+                query += f"WHERE {item[0]}={repr(item[1])}"
+            for key, value in filters.items():
+                query += f" AND {key}={repr(value)}"
+            cur.execute(query)
+            return cur.fetchall()
 
     def get_max(self, column, table_name: str) -> int:
         """gets the next uid in table table_name"""
-        if self.query(table_name, {}):
-            self.cur.execute(MAX.replace('table', table_name).replace('column', column))
-            max_uid = self.cur.fetchone()
-            return max_uid[0] + 1
-        else:
-            return 1
+        with self.connect() as (con, cur):
+            if self.query(table_name, {}):
+                cur.execute(MAX.replace('table', table_name).replace('column', column))
+                max_uid = cur.fetchone()
+                return max_uid[0] + 1
+            else:
+                return 1
 
     def write(self, table_name: str, row: Dict[str, Any]) -> int:
         """writes a new row to table_name. the row given in the format of {column: value}"""
-        self.verify_keys(table_name, list(row.keys()))
-        if 'uid' not in row.keys():
-            row['uid'] = self.get_max('uid', table_name)
-        print(row)
-        self.cur.execute(
-            f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
-        self.con.commit()
-        return row['uid']
+        with self.connect() as (con, cur):
+            self.verify_keys(table_name, list(row.keys()))
+            if 'uid' not in row.keys():
+                row['uid'] = self.get_max('uid', table_name)
+            print(row)
+            cur.execute(
+                f"{INSERT.replace('table', table_name)} {str(tuple(row.keys()))} VALUES{str(tuple(row.values()))}")
+            con.commit()
+            return row['uid']
 
     def update(self, table_name: str, filters: Dict[str, Any], change: Dict[str, Any]):
         """writes a new row to table_name. the row given in the format of {column: value}"""
-        self.verify_keys(table_name, list(filters.keys()))
-        self.verify_keys(table_name, list(change.keys()))
-        query = UPDATE.replace('table', table_name)
-        if change:
-            item = change.popitem()
-            query += f"SET {item[0]}={repr(item[1])}"
-        else:
-            return
-        for key, value in change.items():
-            query += f", {key}={repr(value)}"
-        if filters:
-            item = filters.popitem()
-            query += f"\nWHERE {item[0]}={repr(item[1])}"
-        for key, value in filters.items():
-            query += f" AND {key}={repr(value)}"
-        self.cur.execute(query)
-        self.con.commit()
-
-    def close(self):
-        self.con.close()
+        with self.connect() as (con, cur):
+            self.verify_keys(table_name, list(filters.keys()))
+            self.verify_keys(table_name, list(change.keys()))
+            query = UPDATE.replace('table', table_name)
+            if change:
+                item = change.popitem()
+                query += f"SET {item[0]}={repr(item[1])}"
+            else:
+                return
+            for key, value in change.items():
+                query += f", {key}={repr(value)}"
+            if filters:
+                item = filters.popitem()
+                query += f"\nWHERE {item[0]}={repr(item[1])}"
+            for key, value in filters.items():
+                query += f" AND {key}={repr(value)}"
+            cur.execute(query)
+            con.commit()
