@@ -6,7 +6,7 @@ import pathlib
 from base_client_class import BaseClass
 from client.client_auth import ClientAuth
 from client_send import send
-from communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg, Attachment
+from server.communication_objects import SendMsg, GenericResponse, GetMsg, MsgResponse, ReadMsg, Attachment
 from server_methods import ServerMethods
 import base64
 

@@ -7,7 +7,7 @@ from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse,
 
 
 class ServerMsgs:
-    db = DBHandler()
+    db = DBHandler
     USERS_TABLE = 'users'
     MSGS_TABLE = 'msgs'
     ATTACHMENTS_TABLE = 'attachments'
