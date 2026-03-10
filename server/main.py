@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.templating import Jinja2Templates
+from starlette.responses import HTMLResponse
 
 from communication_objects import *
 from errors import *
@@ -8,6 +10,14 @@ from server_msgs import ServerMsgs
 
 app = FastAPI()
 
+templates = Jinja2Templates(directory="templates")
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("main_page.html", {"request": request})
+
+@app.get("/log_in", response_class=HTMLResponse)
+def login_page(request: Request):
+    return templates.TemplateResponse("dir/log_in.html", {"request": request})
 
 @app.exception_handler(BadRequestError)
 async def auth_exception_handler(request: Request, exc: BadRequestError):
