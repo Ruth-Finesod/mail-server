@@ -41,12 +41,6 @@ class GenericResponse(BaseModel):
     message: str
 
 
-class LogInResponse(BaseModel):
-    status: bool
-    message: str
-    cookie: str
-
-
 class MsgResponse(BaseModel):
     uid: int
     sender_email: str

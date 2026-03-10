@@ -8,7 +8,7 @@ app = FastAPI()
 
 
 @app.post("/auth/login")
-def log_in(request: Login) -> LogInResponse:
+def log_in(request: Login) -> GenericResponse:
     return ServerAuth.log_in(request)
 
 
@@ -27,6 +27,6 @@ def receive_msgs(request: GetMsg) -> List[List[MsgResponse]]:
     return ServerMsgs.get_msgs(request)
 
 
-@app.post("/msgs/receive")
+@app.post("/msgs/read")
 def read_msg(request: ReadMsg) -> GenericResponse:
     return ServerMsgs.read_msg(request)

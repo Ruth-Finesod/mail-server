@@ -33,7 +33,7 @@ class NoSuchTableError(Exception):
 
 class DBHandler:
     def __init__(self):
-        self.con = sqlite3.connect(DB)
+        self.con = sqlite3.connect(DB, check_same_thread=False)
         self.cur = self.con.cursor()
 
     @staticmethod
@@ -106,3 +106,6 @@ class DBHandler:
             query += f" AND {key}={repr(value)}"
         self.cur.execute(query)
         self.con.commit()
+
+    def close(self):
+        self.con.close()

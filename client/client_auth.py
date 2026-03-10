@@ -1,6 +1,6 @@
 from base_client_class import BaseClass
 from client_send import send
-from communication_objects import SignUp, Login, GenericResponse, LogInResponse
+from server.communication_objects import SignUp, Login, GenericResponse, LogInResponse
 from server_methods import ServerMethods
 
 
