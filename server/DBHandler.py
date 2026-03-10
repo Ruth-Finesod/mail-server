@@ -1,6 +1,5 @@
 import sqlite3
 from contextlib import contextmanager
-from fileinput import close
 from typing import Dict, List, Any, Tuple, Generator
 
 DB = "mail_server_db.db"
