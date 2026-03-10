@@ -36,11 +36,6 @@ class GetMsg(BaseModel):
     read: bool
 
 
-class GenericResponse(BaseModel):
-    status: bool
-    message: str
-
-
 class MsgResponse(BaseModel):
     uid: int
     sender_email: str
