@@ -3,40 +3,39 @@ from collections import defaultdict
 from typing import List, Any, Dict
 
 from DBHandler import DBHandler
-from communication_objects import SendMsg, GetMsg, GenericResponse, MsgResponse, ReadMsg, Attachment
+from communication_objects import SendMsg, GetMsg, MsgResponse, ReadMsg, Attachment
+from errors import *
 
 
 class ServerMsgs:
-    db = DBHandler
+    db = DBHandler()
     USERS_TABLE = 'users'
     MSGS_TABLE = 'msgs'
     ATTACHMENTS_TABLE = 'attachments'
     ATTACHMENTS_DIR = './attachments'
 
     @classmethod
-    def send_msg(cls, request: SendMsg) -> GenericResponse:
+    def send_msg(cls, request: SendMsg) -> str:
         """
         adds a message given in the request_data to the db
         :param request: SendMsg
-        :return: in the format of GenericResponse, returns the status of the action
+        :return: message string or errors
         """
         sender = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
         receiver = cls.db.query(cls.USERS_TABLE, {'email': request.receiver_email})
-        if receiver:
-            receiver = receiver[0]
-            message_data = {'sender_uid': sender[0], 'receiver_uid': receiver[0], 'subject': request.subject,
-                            'message': request.msg, 'read': False}
-            if request.reply_to:
-                replied_to = cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0]
-                message_data['conv_uid'] = replied_to[5]
-            else:
-                message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.MSGS_TABLE)
-            msg_uid = cls.db.write(cls.MSGS_TABLE, message_data)
-            cls.send_attachments(msg_uid, request.attachments)
-            response_data = {'status': True, 'message': 'sent message'}
+        if not receiver:
+            raise BadRequestError('receiver email does not exist')
+        receiver = receiver[0]
+        message_data = {'sender_uid': sender[0], 'receiver_uid': receiver[0], 'subject': request.subject,
+                        'message': request.msg, 'read': False}
+        if request.reply_to:
+            replied_to = cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0]
+            message_data['conv_uid'] = replied_to[5]
         else:
-            response_data = {'status': False, 'message': 'receiver email does not exist'}
-        return GenericResponse(**response_data)
+            message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.MSGS_TABLE)
+        msg_uid = cls.db.write(cls.MSGS_TABLE, message_data)
+        cls.send_attachments(msg_uid, request.attachments)
+        return 'sent message'
 
     @classmethod
     def get_msgs(cls, request: GetMsg) -> List[List[MsgResponse]]:
@@ -83,12 +82,11 @@ class ServerMsgs:
         return organized_atts
 
     @classmethod
-    def read_msg(cls, request: ReadMsg) -> GenericResponse:
+    def read_msg(cls, request: ReadMsg) -> str:
         """
         adds a message given in the request_data to the db
         :param request: dict of strings in the format of ReadMsg (only includes the msg uid)
-        :return: in the format of GenericResponse, returns the status of the action
+        :return: message string or errors
         """
         cls.db.update(cls.MSGS_TABLE, {'uid': request.uid}, {'read': True})
-        response_data = {'status': True, 'message': 'message was read'}
-        return GenericResponse(**response_data)
+        return 'message was read'
