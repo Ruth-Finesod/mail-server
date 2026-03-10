@@ -6,6 +6,7 @@ from errors import *
 
 
 class ServerAuth:
+    db = DBHandler()
     USERS_TABLE = 'users'
 
     @classmethod
@@ -15,12 +16,10 @@ class ServerAuth:
         :param request: Login object
         :return: message string or errors
         """
-        db = DBHandler()
         hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
-        user = db.query(cls.USERS_TABLE, {'email': request.email, 'password': hashed_password})
+        user = cls.db.query(cls.USERS_TABLE, {'email': request.email, 'password': hashed_password})
         if not user:
             raise BadRequestError('login failed, username or password is incorrect')
-        db.close()
         return 'logged in successfully'
 
     @classmethod
@@ -30,12 +29,8 @@ class ServerAuth:
         :param request: SignUp object
         :return: message string or errors
         """
-        db = DBHandler()
         hashed_password = sha256(bytes(request.password, 'utf-8')).hexdigest()
-        if db.query(cls.USERS_TABLE, {'email': request.email}):
-            db.close()
+        if cls.db.query(cls.USERS_TABLE, {'email': request.email}):
             raise BadRequestError('username already exists')
-        db = DBHandler()
-        db.write(cls.USERS_TABLE, {'email': request.email, 'password': hashed_password, 'name': request.full_name})
-        db.close()
+        cls.db.write(cls.USERS_TABLE, {'email': request.email, 'password': hashed_password, 'name': request.full_name})
         return 'successfully signed up'

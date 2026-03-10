@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="5bafb5c4-77cb-410a-b678-bc0aac049875" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/communication_objects.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/communication_objects.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/errors.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/errors.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/mail_server_db.db" beforeDir="false" afterPath="$PROJECT_DIR$/server/mail_server_db.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/server/DBHandler.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/DBHandler.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/server/server_auth.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server_auth.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/server/server_msgs.py" beforeDir="false" afterPath="$PROJECT_DIR$/server/server_msgs.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +28,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "Cherry-picking in webdevS",
+    "git-widget-placeholder": "webdevS",
     "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
 }]]></component>

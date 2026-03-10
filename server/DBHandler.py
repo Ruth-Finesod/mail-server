@@ -38,7 +38,7 @@ class DBHandler:
         self.cur = None
 
     @contextmanager
-    def connect(self) -> Generator[Any | None, Any, None]:
+    def connect(self) -> Generator[Any, Any, None]:
         if self.con:
             yield self.con, self.cur
         else:
