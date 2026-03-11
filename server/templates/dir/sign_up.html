@@ -5,6 +5,42 @@
     <title>Title</title>
 </head>
 <body>
+<form id="SignUpForm">
+    <label>email</label>
+<input id="email">
+    <br>
+    <label>full name</label>
+<input id="full_name">
+    <br>
+    <label>password</label>
+<input id="password" type="password">
+    <br>
+    <label>repeat password</label>
+<input id="repeat password" type="password">
+    <br>
+<button type="submit">SignUp</button>
+</form>
+
+<script>
+document.getElementById("SignUpForm").onsubmit = async (e) => {
+  e.preventDefault();
+
+  const data = {
+    email: document.getElementById("email").value,
+    full_name: document.getElementById("full_name").value,
+    password: document.getElementById("password").value
+  };
+
+
+  await fetch("http://127.0.0.1:8000/auth/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+  });
+};
+</script>
 
 </body>
 </html>
