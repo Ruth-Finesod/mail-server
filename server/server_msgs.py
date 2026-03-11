@@ -30,7 +30,7 @@ class ServerMsgs:
                         'message': request.msg, 'read': False}
         if request.reply_to:
             replied_to = cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0]
-            message_data['conv_uid'] = replied_to[5]
+            message_data['conv_uid'] = replied_to[6]
         else:
             message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.MSGS_TABLE)
         msg_uid = cls.db.write(cls.MSGS_TABLE, message_data)
@@ -46,17 +46,15 @@ class ServerMsgs:
         """
         receiver = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
         messages_query = {'receiver_uid': receiver[0]}
-        if not request.read:
-            messages_query['read'] = request.read
         messages = cls.db.query(cls.MSGS_TABLE, messages_query)
         conv_uids = defaultdict(list)
         for message in messages:
             sender = cls.db.query(cls.USERS_TABLE, {'uid': message[1]})[0]
             attachments = [attach.model_dump() for attach in cls.get_attachments(message[0])]
             request_data = {'uid': message[0], 'sender_email': sender[1], 'subject': message[3], 'msg': message[4],
-                            'attachments': attachments}
+                            'attachments': attachments, 'read': message[5]}
             message_data = MsgResponse(**request_data)
-            conv_uids[message[5]].append(message_data)
+            conv_uids[message[6]].append(message_data)
         return list(conv_uids.values())
 
     @classmethod

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 
 class SignUp(BaseModel):
@@ -24,12 +24,11 @@ class SendMsg(BaseModel):
     subject: str
     msg: str
     reply_to: int
-    attachments: List[Dict[str, Any]]
+    attachments: List[Attachment]
 
 
 class GetMsg(BaseModel):
     email: str
-    read: bool
 
 
 class MsgResponse(BaseModel):
@@ -37,7 +36,8 @@ class MsgResponse(BaseModel):
     sender_email: str
     subject: str
     msg: str
-    attachments: List[Dict[str, Any]]
+    attachments: List[Attachment]
+    read: bool
 
 
 class ReadMsg(BaseModel):

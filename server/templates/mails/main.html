@@ -7,14 +7,13 @@
 <body>
 <h3>MAILS:</h3>
 <div id="mails"></div>
-<h3>MESSAGE:</h3>
-<div id="mailContent"></div>
+<h3>CONVERSATION:</h3>
+<div id="convContent"></div>
 
 <script type="module">
 
   const data = {
                 email: localStorage.getItem("email"),
-                read: true
             };
 
     const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
@@ -24,30 +23,37 @@
     },
     body: JSON.stringify(data)
     });
-    const response_json = await response.json();
-    const mails = response_json[0]
+    const convs = await response.json();
     const container = document.getElementById("mails");
 
-for (const mail of mails) {
+for (const conv of convs) {
+    const last_mail = conv[conv.length - 1]
     const btn = document.createElement("button");
-    btn.innerText = "subject: " + mail.subject + " | from:" + mail.sender_email;
+    btn.innerText = "subject: " + last_mail.subject + " | from:" + last_mail.sender_email;
+    if (last_mail.read) {
+        btn.style.opacity = "0.5"
+    }
     btn.onclick = async () => {
-    document.getElementById("mailContent").innerHTML =
-        "<b>From: </b>" + mail.sender_email + "<br>" + 
+    btn.style.opacity = "0.5"
+
+    const mail_div = document.getElementById("convContent");
+    mail_div.innerHTML = ''
+    for (const mail of conv) {
+        mail_div.innerHTML +=
+        "<br><br><b>From: </b>" + mail.sender_email + "<br>" + 
         "<b>Subject:</b> " + mail.subject + "<br><br>" +
         "<b>Message:</b><br>" + mail.msg;
+        const data = {
+            uid: mail.uid,
+        };
+        const response = await fetch("http://127.0.0.1:8000/msgs/read", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+        });
+    }
 
-            const data = {
-                uid: mail.uid,
-            };
-
-    const response = await fetch("http://127.0.0.1:8000/msgs/read", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-    });
+    
 };
     container.appendChild(btn);
     container.appendChild(document.createElement("br"))
