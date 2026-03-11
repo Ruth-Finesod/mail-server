@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Sign Up</title>
 </head>
 <body>
 <form id="SignUpForm">
@@ -28,17 +28,7 @@
 
         const password = document.getElementById("password").value;
         const repeated_password = document.getElementById("repeat password").value;
-        let valid = true;
-        let massage = ''
-        if (password.length < 8) {
-            massage += "password must be at least 8 characters, please try again\n";
-            valid = false;
-        }
-        if (password != repeated_password) {
-            massage += "password dont match, please try again\n";
-            valid = false
-        }
-        if (valid == true) {
+        if (password == repeated_password) {
             const data = {
                 email: document.getElementById("email").value,
                 full_name: document.getElementById("full_name").value,
@@ -53,10 +43,13 @@
             });
             const result = await response.json();
             document.getElementById("message").innerText = result.message;
-        }else document.getElementById("message").innerText = massage;
+        } else document.getElementById("message").innerText = "password dont match, please try again";
     };
 
 
+
+
 </script>
+
 </body>
 </html>

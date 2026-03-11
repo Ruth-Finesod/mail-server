@@ -11,13 +11,27 @@ from server_msgs import ServerMsgs
 app = FastAPI()
 
 templates = Jinja2Templates(directory="templates")
+
+
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
     return templates.TemplateResponse("main_page.html", {"request": request})
 
+
 @app.get("/log_in", response_class=HTMLResponse)
 def login_page(request: Request):
-    return templates.TemplateResponse("dir/log_in.html", {"request": request})
+    return templates.TemplateResponse("auth/log_in.html", {"request": request})
+
+
+@app.get("/sign_up", response_class=HTMLResponse)
+def sign_up_page(request: Request):
+    return templates.TemplateResponse("auth/sign_up.html", {"request": request})
+
+
+@app.get("/mails", response_class=HTMLResponse)
+def sign_up_page(request: Request):
+    return templates.TemplateResponse("mails/main.html", {"request": request})
+
 
 @app.get("/sign_up", response_class=HTMLResponse)
 def sign_up_page(request: Request):
