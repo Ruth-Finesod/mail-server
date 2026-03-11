@@ -15,6 +15,9 @@
     <label>message</label>
     <input id="message">
     <br>
+    <label>attachments</label>
+    <input id="attachments" type="file" multiple>
+    <br>
     <button type="submit">send</button>
     <br>
     <p id="response"></p>
@@ -22,18 +25,37 @@
     <a href="/mails">
     <button>back</button></a>
 <script>
+    async function filesToAttachments(files) {
+    const result = [];
+
+    for (const file of files) {
+        const arrayBuffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(arrayBuffer);
+        let binary = '';
+        for (let b of bytes) binary += String.fromCharCode(b);
+        const base64 = btoa(binary);
+
+        result.push({
+            "file_name": file.name,
+            "file_data": base64
+        });
+    }
+
+    return result;
+}
     document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
+        const attachments = await filesToAttachments(Array.from(document.getElementById("attachments").files))
         const data = {
             email: localStorage.getItem("email"),
             receiver_email: document.getElementById("receiver_email").value,
             subject: document.getElementById("subject").value,
             msg: document.getElementById("message").value,
             reply_to: 0,
-            attachments: []
+            attachments: attachments
         };
-
+        console.log(data)
         const response = await fetch("http://127.0.0.1:8000/msgs/send", {
             method: "POST",
             headers: {
