@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>log in</title>
+    <title>Log In</title>
 </head>
 <body>
 <form id="loginForm">
@@ -21,8 +21,10 @@
     document.getElementById("loginForm").onsubmit = async (e) => {
         e.preventDefault();
 
+        const email = document.getElementById("email").value
+
         const data = {
-            email: document.getElementById("email").value,
+            email: email,
             password: document.getElementById("password").value
         };
 
@@ -34,9 +36,16 @@
             body: JSON.stringify(data)
         });
 
-        const result = await response.json();
-        document.getElementById("message").innerText = result.message;
+        if (response.status == 200){
+            localStorage.setItem("email", email);
+            window.location.href = "/mails";
+        }
+        else if (response.status == 400) {
+            const result = await response.json();
+            document.getElementById("message").innerText = result.message;
+        }
     };
+
 </script>
 </body>
 </html>

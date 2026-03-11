@@ -20,8 +20,6 @@ class Attachment(BaseModel):
 
 class SendMsg(BaseModel):
     email: str
-    password: str
-    cookie: str
     receiver_email: str
     subject: str
     msg: str
@@ -31,8 +29,6 @@ class SendMsg(BaseModel):
 
 class GetMsg(BaseModel):
     email: str
-    password: str
-    cookie: str
     read: bool
 
 

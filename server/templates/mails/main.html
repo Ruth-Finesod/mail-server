@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h3>MAILS:</h3>
+<div id="mails"></div>
+<h3>MESSAGE:</h3>
+<div id="mailContent"></div>
+
+<script type="module">
+
+  const data = {
+                email: localStorage.getItem("email"),
+                read: true
+            };
+
+    const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+    });
+    const response_json = await response.json();
+    const mails = response_json[0]
+    const container = document.getElementById("mails");
+
+for (const mail of mails) {
+    const btn = document.createElement("button");
+    btn.innerText = "subject: " + mail.subject + " | from:" + mail.sender_email;
+    btn.onclick = async () => {
+    document.getElementById("mailContent").innerHTML =
+        "<b>From: </b>" + mail.sender_email + "<br>" + 
+        "<b>Subject:</b> " + mail.subject + "<br><br>" +
+        "<b>Message:</b><br>" + mail.msg;
+
+            const data = {
+                uid: mail.uid,
+            };
+
+    const response = await fetch("http://127.0.0.1:8000/msgs/read", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(data)
+    });
+};
+    container.appendChild(btn);
+    container.appendChild(document.createElement("br"))
+}
+
+</script>
+</body>
+</html>
