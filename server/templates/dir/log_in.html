@@ -7,36 +7,36 @@
 <body>
 <form id="loginForm">
     <label>email</label>
-<input id="email">
+    <input id="email">
     <br>
     <label>password</label>
-<input id="password" type="password">
+    <input id="password" type="password">
     <br>
-<button type="submit">Login</button>
+    <button type="submit">Login</button>
     <br>
 </form>
 <p id="message"></p>
 
 <script>
-document.getElementById("loginForm").onsubmit = async (e) => {
-  e.preventDefault();
+    document.getElementById("loginForm").onsubmit = async (e) => {
+        e.preventDefault();
 
-  const data = {
-    email: document.getElementById("email").value,
-    password: document.getElementById("password").value
-  };
+        const data = {
+            email: document.getElementById("email").value,
+            password: document.getElementById("password").value
+        };
 
-  await fetch("http://127.0.0.1:8000/auth/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
+        const response = await fetch("http://127.0.0.1:8000/auth/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-  const result = await response.json();
-  document.getElementById("message").innerText = result.message;
-};
+        const result = await response.json();
+        document.getElementById("message").innerText = result.message;
+    };
 </script>
 </body>
 </html>

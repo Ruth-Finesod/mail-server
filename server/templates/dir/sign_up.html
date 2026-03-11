@@ -7,39 +7,46 @@
 <body>
 <form id="SignUpForm">
     <label>email</label>
-<input id="email">
+    <input id="email">
     <br>
     <label>full name</label>
-<input id="full_name">
+    <input id="full_name">
     <br>
     <label>password</label>
-<input id="password" type="password">
+    <input id="password" type="password">
     <br>
     <label>repeat password</label>
-<input id="repeat password" type="password">
+    <input id="repeat password" type="password">
     <br>
-<button type="submit">SignUp</button>
+    <button type="submit">SignUp</button>
 </form>
+<p id="message"></p>
 
 <script>
-document.getElementById("SignUpForm").onsubmit = async (e) => {
-  e.preventDefault();
+    document.getElementById("SignUpForm").onsubmit = async (e) => {
+        e.preventDefault();
 
-  const data = {
-    email: document.getElementById("email").value,
-    full_name: document.getElementById("full_name").value,
-    password: document.getElementById("password").value
-  };
+        const password = document.getElementById("password").value;
+        const repeated_password = document.getElementById("repeat password").value;
+        if (password == repeated_password) {
+            const data = {
+                email: document.getElementById("email").value,
+                full_name: document.getElementById("full_name").value,
+                password: document.getElementById("password").value
+            };
+            const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            document.getElementById("message").innerText = result.message;
+        } else document.getElementById("message").innerText = "password dont match, please try again";
+    };
 
 
-  await fetch("http://127.0.0.1:8000/auth/signup", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(data)
-  });
-};
 </script>
 
 </body>
