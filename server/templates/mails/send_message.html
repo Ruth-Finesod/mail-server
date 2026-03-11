@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>send message</title>
+</head>
+<body>
+    <form id="NewMessage">
+    <label>send to:</label>
+    <input id="receiver_email">
+    <br>
+    <label>subject</label>
+    <input id="subject">
+    <br>
+    <label>message</label>
+    <input id="message">
+    <br>
+    <button type="submit">send</button>
+    <br>
+    <p id="response"></p>
+</form>
+    <a href="/mails">
+    <button>back</button></a>
+<script>
+    document.getElementById("NewMessage").onsubmit = async (e) => {
+        e.preventDefault();
+
+        const data = {
+            email: localStorage.getItem("email"),
+            receiver_email: document.getElementById("receiver_email").value,
+            subject: document.getElementById("subject").value,
+            msg: document.getElementById("message").value,
+            reply_to: 0,
+            attachments: []
+        };
+
+        const response = await fetch("http://127.0.0.1:8000/msgs/send", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+        {
+            const result = await response.json();
+            document.getElementById("response").innerText = result.message;
+        }
+    };
+</script>
+</body>
+</html>
