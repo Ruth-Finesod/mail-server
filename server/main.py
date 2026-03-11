@@ -33,6 +33,10 @@ def sign_up_page(request: Request):
     return templates.TemplateResponse("mails/main.html", {"request": request})
 
 
+@app.get("/sign_up", response_class=HTMLResponse)
+def sign_up_page(request: Request):
+    return templates.TemplateResponse("dir/sign_up.html", {"request": request})
+
 @app.exception_handler(BadRequestError)
 async def auth_exception_handler(request: Request, exc: BadRequestError):
     return JSONResponse(
