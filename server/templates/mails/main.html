@@ -5,7 +5,7 @@
     <title>best_mail</title>
   </head>
   <body>
-    <div id="account">you are connected with: </div>
+    <div id="account">you are connected with:</div>
     <a href="/">
       <button onclick="localStorage.removeItem('email')">log out</button>
     </a>
@@ -60,30 +60,37 @@
                 ? "subject: " + mail.subject + " | to: " + mail.receivers_email
                 : "subject: " + mail.subject + " | from: " + mail.sender_email;
             if (mail.read) {
-              btn.style.opacity = "0.5";
+              btn.style.opacity = "0.8";
             }
             btn.onclick = async () => {
-              const all_mails = [
-                ...(Array.isArray(mail.sender_email)
-                  ? mail.sender_email
-                  : [mail.sender_email]),
-                ...(Array.isArray(mail.receivers_email)
-                  ? mail.receivers_email
-                  : [mail.receivers_email]),
-              ];
+              btn.style.opacity = "0.8";
 
-              const other_mails = all_mails.filter((x) => x !== my_email);
-              btn.style.opacity = "0.5";
-              const query = other_mails
-                .map((r) => `receiver_email=${encodeURIComponent(r)}`)
-                .join("&");
-              mail_div.innerHTML = `
-            <a href="/send?${query}&subject=${encodeURIComponent(mail.subject)}&reply_to=${mail.uid}">
-            <button type="button">reply</button></a><br><br>`;
+              mail_div.innerHTML = ``;
               for (const mail of conv) {
+                const all_mails = [
+                  ...(Array.isArray(mail.sender_email)
+                    ? mail.sender_email
+                    : [mail.sender_email]),
+                  ...(Array.isArray(mail.receivers_email)
+                    ? mail.receivers_email
+                    : [mail.receivers_email]),
+                ];
+                const other_mails = all_mails.filter((x) => x !== my_email);
+                const mails_url = other_mails
+                  .map((r) => `receiver_email=${encodeURIComponent(r)}`)
+                  .join("&");
+                if (mail.sender_email != my_email)
+                  mail_div.insertAdjacentHTML(
+                    "beforeend",
+                    `<a href="/send?receiver_email=${encodeURIComponent(mail.sender_email)}&subject=${encodeURIComponent(mail.subject)}&reply_to=${mail.uid}">
+                    <button type="button">reply</button></a>`,
+                  );
                 mail_div.insertAdjacentHTML(
                   "beforeend",
-                  `<b>From:</b> ${mail.sender_email}<br>
+                  `<a href="/send?${mails_url}&subject=${encodeURIComponent(mail.subject)}&reply_to=${mail.uid}">
+                    <button type="button">reply all</button></a>
+                    <br><br>
+                  <b>From:</b> ${mail.sender_email}<br>
                     <b>To:</b> ${mail.receivers_email.join(", ")}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
                 <b>Message:</b><br>${mail.msg}<br>`,
