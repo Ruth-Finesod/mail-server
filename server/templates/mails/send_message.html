@@ -36,7 +36,7 @@
     }
 
     const params = new URLSearchParams(window.location.search);
-    const receivers_email = params.get("receivers_email")
+    const receivers_email = params.getAll("receivers_email")
     const subject = params.get("subject")
     document.getElementById("subject").value = subject
     document.getElementsByClassName("receivers_email").value = receivers_email[0]

@@ -1,114 +1,132 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>best_mail</title>
-</head>
-<body>
-<div id="account">you are connected with: </div>
-<a href="/">
-    <button onclick="localStorage.removeItem('email')">log out</button>
-</a>
-<br><br>
-<a href="/send">
-    <button>send new message</button>
-</a>
-<br><br>
-<button id="inbox">Inbox</button>
-<button id="sent">Sent</button>
-<br>
-<h3>MAILS:</h3>
-<div id="mails"></div>
-<h3>CONVERSATION:</h3>
-<div id="convContent"></div>
+  </head>
+  <body>
+    <div id="account">you are connected with:</div>
+    <a href="/">
+      <button onclick="localStorage.removeItem('email')">log out</button>
+    </a>
+    <br /><br />
+    <a href="/send">
+      <button>send new message</button>
+    </a>
+    <br /><br />
+    <button id="inbox">Inbox</button>
+    <button id="sent">Sent</button>
+    <br />
+    <h3>MAILS:</h3>
+    <div id="mails"></div>
+    <h3>CONVERSATION:</h3>
+    <div id="convContent"></div>
 
-<script type="module">
-    const my_email = localStorage.getItem("email")
-    document.getElementById("account").textContent += my_email
-    const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
+    <script type="module">
+      const my_email = localStorage.getItem("email");
+      document.getElementById("account").textContent += my_email;
+      const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({email: my_email})});
-    const convs = await response.json();
-    const container = document.getElementById("mails");
-    const mail_div = document.getElementById("convContent");
-    let mode = "inbox";
-    renderMails()
+        body: JSON.stringify({ email: my_email }),
+      });
+      const convs = await response.json();
+      const container = document.getElementById("mails");
+      const mail_div = document.getElementById("convContent");
+      let mode = "inbox";
+      renderMails();
 
-    document.getElementById("inbox").onclick = () => {
+      document.getElementById("inbox").onclick = () => {
         mode = "inbox";
-        renderMails()
-    }
+        renderMails();
+      };
 
-    document.getElementById("sent").onclick = () => {
+      document.getElementById("sent").onclick = () => {
         mode = "sent";
-        renderMails()
-    }
+        renderMails();
+      };
 
-    function renderMails() {
-    container.innerHTML = ""
-    for (const conv of convs) {
-        for (const mail of conv){
-        if (mode == "inbox" && mail.sender_email == my_email)
-            continue;
-        if (mode == "sent" && mail.sender_email != my_email)
-            continue;
-        const btn = document.createElement("button");
-        btn.innerText = 
-        mode === "sent"
-        ? "subject: " + mail.subject + " | to: " + mail.receiver_email
-        : "subject: " + mail.subject + " | from: " + mail.sender_email;
-        if (mail.read) {
-            btn.style.opacity = "0.5"
-        }
-        btn.onclick = async () => {
-            let other_mail = ''
-            if (mode == "sent")
-                other_mail = mail.receiver_email
-            else
-                other_mail = mail.sender_email
-            btn.style.opacity = "0.5"
-            mail_div.innerHTML = `
-                <a href="/send?receiver_email=${other_mail}&subject=${mail.subject}&reply_to=${mail.uid}">
-                <button type="button">reply</button></a><br><br>`
-            for (const mail of conv) {
-                mail_div.insertAdjacentHTML("beforeend",
-                    `<b>From:</b> ${mail.sender_email}<br>
-                    <b>To:</b> ${mail.receivers_email.join(', ')}<br>
-                <b>Subject:</b> ${mail.subject}<br><br>
-                <b>Message:</b><br>${mail.msg}<br>`);
-                if (mail.attachments.length > 0) {
-                    mail_div.insertAdjacentHTML("beforeend",
-                        "<br><b>Attachments:</b><div>click to download</div>");
-                    for (const file of mail.attachments) {
-                        let btn = document.createElement('button');
-                        btn.textContent = file.file_name;
-                        btn.onclick = function () {
-                            let blob = new Blob([Uint8Array.from(atob(file.file_data), c => c.charCodeAt(0))]);
-                            let link = document.createElement("a");
-                            link.href = URL.createObjectURL(blob);
-                            link.download = file.file_name;
-                            link.click();
-                        };
-                        mail_div.appendChild(btn)
-                    }
-                }
-                mail_div.insertAdjacentHTML("beforeend",`<br><br><br>`);
-                if (mail.receiver_email == my_email){
-                    await fetch("http://127.0.0.1:8000/msgs/read", {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({uid: mail.uid,})
-                    });}
+      function renderMails() {
+        container.innerHTML = "";
+        for (const conv of convs) {
+          for (const mail of conv) {
+            if (mode == "inbox" && mail.sender_email == my_email) continue;
+            if (mode == "sent" && mail.sender_email != my_email) continue;
+            const btn = document.createElement("button");
+            btn.innerText =
+              mode === "sent"
+                ? "subject: " + mail.subject + " | to: " + mail.receivers_email
+                : "subject: " + mail.subject + " | from: " + mail.sender_email;
+            if (mail.read) {
+              btn.style.opacity = "0.5";
             }
-        };
-        container.appendChild(btn);
-        container.appendChild(document.createElement("br"))
-        break;
-    }}}
+            btn.onclick = async () => {
+              console.log(mail.receivers_email);
+              const all_mails = [
+                ...(Array.isArray(mail.sender_email)
+                  ? mail.sender_email
+                  : [mail.sender_email]),
+                ...(Array.isArray(mail.receivers_email)
+                  ? mail.receivers_email
+                  : [mail.receivers_email]),
+              ];
 
-</script>
-</body>
+              const other_mails = all_mails.filter((x) => x !== my_email);
+              btn.style.opacity = "0.5";
+              const query = other_mails
+                .map((r) => `receiver_email=${encodeURIComponent(r)}`)
+                .join("&");
+              mail_div.innerHTML += `
+            <a href="/send?${query}&subject=${encodeURIComponent(mail.subject)}&reply_to=${mail.uid}">
+            <button type="button">reply</button></a><br><br>`;
+              for (const mail of conv) {
+                mail_div.insertAdjacentHTML(
+                  "beforeend",
+                  `<b>From:</b> ${mail.sender_email}<br>
+                    <b>To:</b> ${mail.receivers_email.join(", ")}<br>
+                <b>Subject:</b> ${mail.subject}<br><br>
+                <b>Message:</b><br>${mail.msg}<br>`,
+                );
+                if (mail.attachments.length > 0) {
+                  mail_div.insertAdjacentHTML(
+                    "beforeend",
+                    "<br><b>Attachments:</b><div>click to download</div>",
+                  );
+                  for (const file of mail.attachments) {
+                    let btn = document.createElement("button");
+                    btn.textContent = file.file_name;
+                    btn.onclick = function () {
+                      let blob = new Blob([
+                        Uint8Array.from(atob(file.file_data), (c) =>
+                          c.charCodeAt(0),
+                        ),
+                      ]);
+                      let link = document.createElement("a");
+                      link.href = URL.createObjectURL(blob);
+                      link.download = file.file_name;
+                      link.click();
+                    };
+                    mail_div.appendChild(btn);
+                  }
+                }
+                mail_div.insertAdjacentHTML("beforeend", `<br><br><br>`);
+                if (mail.receiver_emails == my_email) {
+                  await fetch("http://127.0.0.1:8000/msgs/read", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ uid: mail.uid }),
+                  });
+                }
+              }
+            };
+            container.appendChild(btn);
+            container.appendChild(document.createElement("br"));
+            break;
+          }
+        }
+      }
+    </script>
+  </body>
 </html>

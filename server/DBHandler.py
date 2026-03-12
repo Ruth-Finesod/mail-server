@@ -93,8 +93,6 @@ class DBHandler:
             if filters:
                 item = filters.popitem()
                 query += f"WHERE ',' || {item[0]} || ',' LIKE '%,{repr(item[1])},%'"
-            for key, value in filters.items():
-                query += f" AND ',' || {key} || ',' LIKE '%,{repr(value)},%'"
             cur.execute(query)
             return cur.fetchall()
 
