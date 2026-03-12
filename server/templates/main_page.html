@@ -13,6 +13,10 @@
 <a href="/log_in">
     <button>log in</button>
 </a>
-
 </body>
+<script>
+    if(localStorage.getItem('email') != null){
+        window.location.href = "/mails";
+    }
+</script>
 </html>
