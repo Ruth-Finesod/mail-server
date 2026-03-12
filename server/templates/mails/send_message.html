@@ -37,9 +37,7 @@
     }
 
     const params = new URLSearchParams(window.location.search);
-    for (const [key, value] of params) {
-    console.log(key, value);
-    const receivers_email = params.get("receivers_email")
+    const receivers_email = params.getAll("receivers_email")
     const subject = params.get("subject")
     if (params.get('reply_to') != 0) {
         document.getElementById("subject").value = subject
