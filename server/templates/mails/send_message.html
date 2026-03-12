@@ -37,15 +37,17 @@
     }
 
     const params = new URLSearchParams(window.location.search);
-    const receivers_email = params.getAll("receivers_email")
+    const receivers_email = params.getAll("receiver_email")
     const subject = params.get("subject")
-    if (params.get('reply_to') != 0) {
+    if (params.get('reply_to')) {
         document.getElementById("subject").value = subject
         document.getElementById("receivers_email").value = receivers_email[0]
+        const to = document.getElementById('to')
         for (const receiver of receivers_email.slice(1, receivers_email.length)) {
             var input = document.createElement("input");
             input.className = "receivers_email";
-            input.value = receiver.value;
+            input.value = receiver;
+            to.appendChild(input)
         }
     }
 
@@ -99,7 +101,6 @@
             document.getElementById("response").innerText = result.message;
         }
     };
-    }
 </script>
 </body>
 </html>
