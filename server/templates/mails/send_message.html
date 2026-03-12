@@ -5,9 +5,9 @@
     <title>send message</title>
 </head>
 <body>
-    <form id="NewMessage">
+<form id="NewMessage">
     <div id="to"><label>send to:</label>
-    <input class="receivers_email"></div>
+        <input id="receivers_email" class="receivers_email"></div>
     <button id="add" type="button">add</button>
     <br>
     <label>subject</label>
@@ -23,45 +23,52 @@
     <br>
     <p id="response"></p>
 </form>
-    <a href="/mails">
-    <button>back</button></a>
+<a href="/mails">
+    <button>back</button>
+</a>
 <script>
 
     const msgform = document.getElementById('to')
     add = document.getElementById('add')
-    add.onclick = function() {
+    add.onclick = function () {
         var input = document.createElement('input')
         input.className = 'receivers_email'
         msgform.appendChild(input)
     }
 
     const params = new URLSearchParams(window.location.search);
+    for (const [key, value] of params) {
+    console.log(key, value);
     const receivers_email = params.get("receivers_email")
     const subject = params.get("subject")
-    document.getElementById("subject").value = subject
-    document.getElementsByClassName("receivers_email").value = receivers_email[0]
-    for(const receiver of receivers_email.slice(1, receivers_email.length)){
-        var input = document.createElement("input");
-        input.className = "receivers_email";
-        input.value = receiver.value;}
-
-    async function filesToAttachments(files) {
-    const result = [];
-    for (const file of files) {
-        const arrayBuffer = await file.arrayBuffer();
-        const bytes = new Uint8Array(arrayBuffer);
-        let binary = '';
-        for (let b of bytes) binary += String.fromCharCode(b);
-        const base64 = btoa(binary);
-
-        result.push({
-            "file_name": file.name,
-            "file_data": base64
-        });
+    if (params.get('reply_to') != 0) {
+        document.getElementById("subject").value = subject
+        document.getElementById("receivers_email").value = receivers_email[0]
+        for (const receiver of receivers_email.slice(1, receivers_email.length)) {
+            var input = document.createElement("input");
+            input.className = "receivers_email";
+            input.value = receiver.value;
+        }
     }
 
-    return result;
-}
+    async function filesToAttachments(files) {
+        const result = [];
+        for (const file of files) {
+            const arrayBuffer = await file.arrayBuffer();
+            const bytes = new Uint8Array(arrayBuffer);
+            let binary = '';
+            for (let b of bytes) binary += String.fromCharCode(b);
+            const base64 = btoa(binary);
+
+            result.push({
+                "file_name": file.name,
+                "file_data": base64
+            });
+        }
+
+        return result;
+    }
+
     document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
@@ -94,6 +101,7 @@
             document.getElementById("response").innerText = result.message;
         }
     };
+    }
 </script>
 </body>
 </html>
