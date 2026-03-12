@@ -1,40 +1,41 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>send message</title>
-</head>
-<body>
-<form id="NewMessage">
-    <div id="to"><label>send to:</label>
-        <input id="receivers_email" class="receivers_email"></div>
-    <button id="add" type="button">add</button>
-    <br>
-    <label>subject</label>
-    <input id="subject">
-    <br>
-    <label>message</label>
-    <input id="message">
-    <br>
-    <label>attachments</label>
-    <input id="attachments" type="file" multiple>
-    <br>
-    <button type="submit">send</button>
-    <br>
-    <p id="response"></p>
-</form>
-<a href="/mails">
-    <button>back</button>
-</a>
-<script>
-
-    const msgform = document.getElementById('to')
-    add = document.getElementById('add')
-    add.onclick = function () {
-        var input = document.createElement('input')
-        input.className = 'receivers_email'
-        msgform.appendChild(input)
-    }
+  </head>
+  <body>
+    <form id="NewMessage">
+      <div id="to">
+        <label>send to:</label>
+        <input id="receivers_email" class="receivers_email" />
+      </div>
+      <button id="add" type="button">add</button>
+      <br />
+      <label>subject</label>
+      <input id="subject" />
+      <br />
+      <label>message</label>
+      <input id="message" />
+      <br />
+      <label>attachments</label>
+      <input id="attachments" type="file" multiple />
+      <br />
+      <button type="submit">send</button>
+      <br />
+      <p id="response"></p>
+    </form>
+    <a href="/mails">
+      <button>back</button>
+    </a>
+    <script>
+      const msgform = document.getElementById("to");
+      add = document.getElementById("add");
+      add.onclick = function () {
+        var input = document.createElement("input");
+        input.className = "receivers_email";
+        msgform.appendChild(input);
+      };
 
     const params = new URLSearchParams(window.location.search);
     const receivers_email = params.getAll("receiver_email")
