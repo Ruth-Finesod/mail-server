@@ -7,6 +7,12 @@ from communication_objects import SendMsg, GetMsg, MsgResponse, ReadMsg, Attachm
 from errors import *
 
 
+class DBMessage:
+    def __init__(self, row):
+        self.uid, self.sender_uid, self.subject, self.message, self.read, self.conv_uid, self.receivers_uid = row
+        self.receivers_uid = [int(receiver_uid) for receiver_uid in self.receivers_uid.split(',')]
+
+
 class ServerMsgs:
     db = DBHandler()
     USERS_TABLE = 'users'
@@ -22,15 +28,17 @@ class ServerMsgs:
         :return: message string or errors
         """
         sender = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
-        receiver = cls.db.query(cls.USERS_TABLE, {'email': request.receiver_email})
-        if not receiver:
-            raise BadRequestError('receiver email does not exist')
-        receiver = receiver[0]
-        message_data = {'sender_uid': sender[0], 'receiver_uid': receiver[0], 'subject': request.subject,
-                        'message': request.msg, 'read': False}
+        receivers = []
+        for receiver_email in request.receivers_email:
+            receiver = cls.db.query(cls.USERS_TABLE, {'email': receiver_email})
+            if not receiver:
+                raise BadRequestError('receiver email does not exist')
+            receivers.append(receiver[0])
+        message_data = {'sender_uid': sender[0], 'receivers_uid': ','.join(map(str, [receiver[0] for receiver in receivers])),
+                        'subject': request.subject, 'message': request.msg, 'read': False}
         if request.reply_to:
-            replied_to = cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0]
-            message_data['conv_uid'] = replied_to[6]
+            replied_to = DBMessage(cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0])
+            message_data['conv_uid'] = replied_to.conv_uid
         else:
             message_data['conv_uid'] = cls.db.get_max('conv_uid', cls.MSGS_TABLE)
         msg_uid = cls.db.write(cls.MSGS_TABLE, message_data)
@@ -45,17 +53,19 @@ class ServerMsgs:
         :return: List of Lists of MsgResponses with the email information divided by conv uid
         """
         user = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
-        messages = cls.db.query(cls.MSGS_TABLE, {'receiver_uid': user[0]})
+        messages = cls.db.query_in(cls.MSGS_TABLE, {'receivers_uid': user[0]})
         messages += cls.db.query(cls.MSGS_TABLE, {'sender_uid': user[0]})
         conv_uids = defaultdict(list)
         for message in messages:
-            receiver = cls.db.query(cls.USERS_TABLE, {'uid': message[2]})[0]
-            sender = cls.db.query(cls.USERS_TABLE, {'uid': message[1]})[0]
-            attachments = cls.get_attachments(message[0])
-            request_data = {'uid': message[0], 'sender_email': sender[1], 'receiver_email': receiver[1],
-                            'subject': message[3], 'msg': message[4], 'attachments': attachments, 'read': message[5]}
+            message = DBMessage(message)
+            receivers = [cls.db.query(cls.USERS_TABLE, {'uid': receiver_uid})[0] for receiver_uid in message.receivers_uid]
+            sender = cls.db.query(cls.USERS_TABLE, {'uid': message.sender_uid})[0]
+            attachments = cls.get_attachments(message.uid)
+            request_data = {'uid': message.uid, 'sender_email': sender[1],
+                            'receivers_email': [receiver[1] for receiver in receivers], 'subject': message.subject,
+                            'msg': message.message, 'attachments': attachments, 'read': message.read}
             message_data = MsgResponse(**request_data)
-            conv_uids[message[6]].append(message_data)
+            conv_uids[message.conv_uid].append(message_data)
         return list(conv_uids.values())
 
     @classmethod

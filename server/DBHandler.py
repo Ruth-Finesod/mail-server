@@ -19,7 +19,7 @@ SELECT MAX(column)
 FROM table
 """
 
-MSGS_COLUMNS = ['uid', 'sender_uid', 'receiver_uid', 'subject', 'message', 'read', 'conv_uid']
+MSGS_COLUMNS = ['uid', 'sender_uid', 'receivers_uid', 'subject', 'message', 'read', 'conv_uid']
 USERS_COLUMNS = ['uid', 'email', 'name', 'password']
 ATTACHMENTS_COLUMNS = ['uid', 'file_name', 'msg_uid']
 
@@ -77,6 +77,24 @@ class DBHandler:
                 query += f"WHERE {item[0]}={repr(item[1])}"
             for key, value in filters.items():
                 query += f" AND {key}={repr(value)}"
+            cur.execute(query)
+            return cur.fetchall()
+
+    def query_in(self, table_name: str, filters: Dict[str, Any]) -> List[Tuple]:
+        """
+        preforms a query based on a table name and filters in a dict
+        :param table_name: the name of the table in the db
+        :param filters: dict with the keys as columns names and values as their values
+        :return: list of
+        """
+        with self.connect() as (con, cur):
+            self.verify_keys(table_name, list(filters.keys()))
+            query = SELECT.replace('table', table_name)
+            if filters:
+                item = filters.popitem()
+                query += f"WHERE ',' || {item[0]} || ',' LIKE '%,{repr(item[1])},%'"
+            for key, value in filters.items():
+                query += f" AND ',' || {key} || ',' LIKE '%,{repr(value)},%'"
             cur.execute(query)
             return cur.fetchall()
 

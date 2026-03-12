@@ -20,7 +20,7 @@ class Attachment(BaseModel):
 
 class SendMsg(BaseModel):
     email: str
-    receiver_email: str
+    receivers_email: List[str]
     subject: str
     msg: str
     reply_to: int
@@ -34,7 +34,7 @@ class GetMsg(BaseModel):
 class MsgResponse(BaseModel):
     uid: int
     sender_email: str
-    receiver_email: str
+    receivers_email: List[str]
     subject: str
     msg: str
     attachments: List[Attachment]
