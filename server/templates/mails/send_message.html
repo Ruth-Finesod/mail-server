@@ -6,8 +6,9 @@
 </head>
 <body>
     <form id="NewMessage">
-    <label>send to:</label>
-    <input id="receiver_email">
+    <div id="to"><label>send to:</label>
+    <input class="receivers_email"></div>
+    <button id="add" type="button">add</button>
     <br>
     <label>subject</label>
     <input id="subject">
@@ -25,11 +26,24 @@
     <a href="/mails">
     <button>back</button></a>
 <script>
+
+    const msgform = document.getElementById('to')
+    add = document.getElementById('add')
+    add.onclick = function() {
+        var input = document.createElement('input')
+        input.className = 'receivers_email'
+        msgform.appendChild(input)
+    }
+
     const params = new URLSearchParams(window.location.search);
-    const receiver_email = params.get("receiver_email")
+    const receivers_email = params.get("receivers_email")
     const subject = params.get("subject")
-    document.getElementById("receiver_email").value = receiver_email
     document.getElementById("subject").value = subject
+    document.getElementsByClassName("receivers_email").value = receivers_email[0]
+    for(const receiver of receivers_email.slice(1, receivers_email.length)){
+        var input = document.createElement("input");
+        input.className = "receivers_email";
+        input.value = receiver.value;}
 
     async function filesToAttachments(files) {
     const result = [];
@@ -51,6 +65,9 @@
     document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
+        const receivers_email = Array.from(document.querySelectorAll('.receivers_email')).map(i => i.value);
+        console.log(receivers_email)
+
         let reply_to = params.get("reply_to")
         if (!reply_to)
             reply_to = 0
@@ -58,7 +75,7 @@
         const attachments = await filesToAttachments(Array.from(document.getElementById("attachments").files))
         const data = {
             email: localStorage.getItem("email"),
-            receiver_email: document.getElementById("receiver_email").value,
+            receivers_email: receivers_email,
             subject: document.getElementById("subject").value,
             msg: document.getElementById("message").value,
             reply_to: reply_to,

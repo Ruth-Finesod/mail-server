@@ -76,7 +76,7 @@
             for (const mail of conv) {
                 mail_div.insertAdjacentHTML("beforeend",
                     `<b>From:</b> ${mail.sender_email}<br>
-                    <b>To:</b> ${mail.receiver_email}<br>
+                    <b>To:</b> ${mail.receivers_email.join(', ')}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
                 <b>Message:</b><br>${mail.msg}<br>`);
                 if (mail.attachments.length > 0) {
