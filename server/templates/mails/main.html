@@ -13,6 +13,10 @@
 <a href="/send">
     <button>send new message</button>
 </a>
+<br><br>
+<button id="inbox">Inbox</button>
+<button id="sent">Sent</button>
+<br>
 <h3>MAILS:</h3>
 <div id="mails"></div>
 <h3>CONVERSATION:</h3>
@@ -21,25 +25,35 @@
 <script type="module">
     const my_email = localStorage.getItem("email")
     document.getElementById("account").textContent += my_email
-
-    const data = {
-        email: my_email
-    };
-
     const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
         },
-        body: JSON.stringify(data)
-    });
+        body: JSON.stringify({email: my_email})});
     const convs = await response.json();
     const container = document.getElementById("mails");
     const mail_div = document.getElementById("convContent");
+    let mode = "inbox";
+    renderMails()
 
+    document.getElementById("inbox").onclick = () => {
+        mode = "inbox";
+        renderMails()
+    }
+
+    document.getElementById("sent").onclick = () => {
+        mode = "sent";
+        renderMails()
+    }
+
+    function renderMails() {
+    container.innerHTML = ""
     for (const conv of convs) {
         for (const mail of conv){
-        if (mail.sender_email == my_email)
+        if (mode == "inbox" && mail.sender_email == my_email)
+            continue;
+        if (mode == "sent" && mail.sender_email != my_email)
             continue;
         const btn = document.createElement("button");
         btn.innerText = "subject: " + mail.subject + " | from:" + mail.sender_email;
@@ -84,7 +98,7 @@
         container.appendChild(btn);
         container.appendChild(document.createElement("br"))
         break;
-    }}
+    }}}
 
 </script>
 </body>
