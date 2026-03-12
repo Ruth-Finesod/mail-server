@@ -11,6 +11,7 @@ class DBMessage:
     def __init__(self, row):
         self.uid, self.sender_uid, self.subject, self.message, self.read, self.conv_uid, self.receivers_uid = row
         self.receivers_uid = [int(receiver_uid) for receiver_uid in self.receivers_uid.split(',')]
+        self.read = [int(read) for read in str(self.read).split(',')]
 
 
 class ServerMsgs:
@@ -35,7 +36,7 @@ class ServerMsgs:
                 raise BadRequestError('receiver email does not exist')
             receivers.append(receiver[0])
         message_data = {'sender_uid': sender[0], 'receivers_uid': ','.join(map(str, [receiver[0] for receiver in receivers])),
-                        'subject': request.subject, 'message': request.msg, 'read': False}
+                        'subject': request.subject, 'message': request.msg, 'read': ','.join(map(str, [0 for receiver in receivers]))}
         if request.reply_to:
             replied_to = DBMessage(cls.db.query(cls.MSGS_TABLE, {'uid': request.reply_to})[0])
             message_data['conv_uid'] = replied_to.conv_uid
@@ -61,9 +62,13 @@ class ServerMsgs:
             receivers = [cls.db.query(cls.USERS_TABLE, {'uid': receiver_uid})[0] for receiver_uid in message.receivers_uid]
             sender = cls.db.query(cls.USERS_TABLE, {'uid': message.sender_uid})[0]
             attachments = cls.get_attachments(message.uid)
+            if sender == user:
+                read = 1
+            else:
+                read = message.read[message.receivers_uid.index(user[0])]
             request_data = {'uid': message.uid, 'sender_email': sender[1],
                             'receivers_email': [receiver[1] for receiver in receivers], 'subject': message.subject,
-                            'msg': message.message, 'attachments': attachments, 'read': message.read}
+                            'msg': message.message, 'attachments': attachments, 'read': read}
             message_data = MsgResponse(**request_data)
             conv_uids[message.conv_uid].append(message_data)
         return list(conv_uids.values())
@@ -96,5 +101,9 @@ class ServerMsgs:
         :param request: dict of strings in the format of ReadMsg (only includes the msg uid)
         :return: message string or errors
         """
-        cls.db.update(cls.MSGS_TABLE, {'uid': request.uid}, {'read': True})
+        msg = DBMessage(cls.db.query(cls.MSGS_TABLE, {'uid': request.uid})[0])
+        user = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
+        user_uid = user[0]
+        msg.read[msg.receivers_uid.index(user_uid)] = 1
+        cls.db.update(cls.MSGS_TABLE, {'uid': request.uid}, {'read': ','.join(map(str, [str(read) for read in msg.read]))})
         return 'message was read'

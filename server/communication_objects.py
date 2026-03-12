@@ -43,3 +43,4 @@ class MsgResponse(BaseModel):
 
 class ReadMsg(BaseModel):
     uid: int
+    email: str

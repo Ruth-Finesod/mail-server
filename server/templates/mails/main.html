@@ -111,11 +111,11 @@
                   }
                 }
                 mail_div.insertAdjacentHTML("beforeend", `<br><br><br>`);
-                if (mail.receiver_emails == my_email) {
+                if (mail.sender_email != my_email) {
                   await fetch("http://127.0.0.1:8000/msgs/read", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ uid: mail.uid }),
+                    body: JSON.stringify({ uid: mail.uid, email: my_email }),
                   });
                 }
               }
