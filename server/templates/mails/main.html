@@ -41,19 +41,20 @@ for (const conv of convs) {
     const mail_div = document.getElementById("convContent");
     mail_div.innerHTML = ''
     for (const mail of conv) {
-        mail_div.innerHTML +=
-        "<br><br><b>From: </b>" + mail.sender_email + "<br>" + 
-        "<b>Subject:</b> " + mail.subject + "<br><br>" +
-        "<b>Message:</b><br>" + mail.msg;
-        const data = {
-            uid: mail.uid,
-        };
-        const response = await fetch("http://127.0.0.1:8000/msgs/read", {
+       mail_div.innerHTML += `
+        <br><br><b>From:</b> ${mail.sender_email}<br>
+        <b>Subject:</b> ${mail.subject}<br><br>
+        <b>Message:</b><br>${mail.msg}<br>
+        <a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
+        <button>reply</button></a>`;
+        
+        await fetch("http://127.0.0.1:8000/msgs/read", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data)
+        body: JSON.stringify({uid: mail.uid,})
         });
     }
+    
 
     
 };

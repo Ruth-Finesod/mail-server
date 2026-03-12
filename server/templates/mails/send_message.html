@@ -25,9 +25,14 @@
     <a href="/mails">
     <button>back</button></a>
 <script>
+    const params = new URLSearchParams(window.location.search);
+    const receiver_email = params.get("receiver_email")
+    const subject = params.get("subject")
+    document.getElementById("receiver_email").value = receiver_email
+    document.getElementById("subject").value = subject
+
     async function filesToAttachments(files) {
     const result = [];
-
     for (const file of files) {
         const arrayBuffer = await file.arrayBuffer();
         const bytes = new Uint8Array(arrayBuffer);
@@ -46,13 +51,17 @@
     document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
+        const reply_to = params.get("reply_to")
+        if (!reply_to)
+            reply_to = 0
+
         const attachments = await filesToAttachments(Array.from(document.getElementById("attachments").files))
         const data = {
             email: localStorage.getItem("email"),
             receiver_email: document.getElementById("receiver_email").value,
             subject: document.getElementById("subject").value,
             msg: document.getElementById("message").value,
-            reply_to: 0,
+            reply_to: reply_to,
             attachments: attachments
         };
         console.log(data)
