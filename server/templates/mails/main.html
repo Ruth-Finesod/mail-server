@@ -50,9 +50,9 @@
             mail_div.innerHTML = ''
             for (const mail of conv) {
                 mail_div.insertAdjacentHTML("beforeend",
-                    `<br><br><b>From:</b> ${mail.sender_email}<br>
+                    `<b>From:</b> ${mail.sender_email}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
-                <b>Message:</b><br>${mail.msg}<br>`);
+                <b>Message:</b><br>${mail.msg}<br><br>`);
                 if (mail.attachments.length > 0) {
                     mail_div.insertAdjacentHTML("beforeend",
                         "<b>Attachments:</b><div>click to download</div>");
@@ -70,7 +70,7 @@
                     }
                 }
                 mail_div.insertAdjacentHTML("beforeend", `
-                <br><a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
+                <br><br><a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
                 <button type="button">reply</button></a>`);
 
                 await fetch("http://127.0.0.1:8000/msgs/read", {
