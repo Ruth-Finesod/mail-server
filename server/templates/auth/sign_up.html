@@ -16,48 +16,73 @@
     <input id="password" type="password">
     <br>
     <label>repeat password</label>
-    <input id="repeat password" type="password">
+    <input id="repeat_password" type="password">
     <br>
-    <button type="submit">SignUp</button>
+    <br>
+    <button id="submit" type="submit" disabled>SignUp</button>
 </form>
-<br>
-<p>already have an account? <a href="/log_in">click here</a> to log in</p>
-<p id="message"></p>
+<div id="message"><br></div>
 
 <script>
-    document.getElementById("SignUpForm").onsubmit = async (e) => {
-        e.preventDefault();
+const msg = document.getElementById("message")
+const submit = document.getElementById("submit")
 
-        const password = document.getElementById("password").value;
-        const repeated_password = document.getElementById("repeat password").value;
-        if (password == repeated_password) {
-            const data = {
-                email: document.getElementById("email").value,
-                full_name: document.getElementById("full_name").value,
-                password: document.getElementById("password").value
-            };
-            const response = await fetch("http://127.0.0.1:8000/auth/signup", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-            if (response.status == 200){
-                localStorage.setItem("email", email);
-                window.location.href = "/mails";
-            }
-            else if (response.status == 400) {
-                const result = await response.json();
-                document.getElementById("message").innerText = result.message;
-        } else document.getElementById("message").innerText = "password dont match, please try again";
-    };
+const password = document.getElementById("password");
+const repeatPassword = document.getElementById("repeat_password");
+
+function validate() {
+    msg.innerHTML = '<br>';
+    let valid = true;
+    if (password.value.length < 8) {
+        msg.innerHTML += 'Password must be at least 8 characters<br>';
+        valid = false;
+    }
+    if (!/[A-Z]/.test(password.value)) {
+        msg.innerHTML += 'Must include uppercase letter<br>';
+        valid = false;
+    }
+    if (!/[a-z]/.test(password.value)) {
+        msg.innerHTML += 'Must include lowercase letter<br>';
+        valid = false;
+    }
+    if (!/[0-9]/.test(password.value)) {
+        msg.innerHTML += 'Must include number<br>';
+        valid = false;
+    }
+    if (password.value !== repeatPassword.value) {
+        msg.innerHTML += 'Passwords do not match<br>';
+        valid = false;
+    }
+    submit.disabled = !valid;
 }
+validate()
+password.oninput = validate;
+repeatPassword.oninput = validate;
 
+document.getElementById("SignUpForm").onsubmit = async (e) => {
+    e.preventDefault();
+    if(submit.disabled) return;
 
+    const data = {
+        email: document.getElementById("email").value,
+        full_name: document.getElementById("full_name").value,
+        password: password.value
+    };
 
+    const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
 
+    if (response.status == 200) {
+        localStorage.setItem("email", data.email);
+        window.location.href = "/mails";
+    } else {
+        const result = await response.json();
+        msg.innerText = result.message;
+    }
+};
 </script>
-
 </body>
 </html>

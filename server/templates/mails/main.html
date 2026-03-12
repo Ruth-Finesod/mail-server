@@ -78,7 +78,7 @@
                     `<b>From:</b> ${mail.sender_email}<br>
                     <b>To:</b> ${mail.receiver_email}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
-                <b>Message:</b><br>${mail.msg}<br>`);
+                <b>Message:</b><br>${mail.msg}<br><br>`);
                 if (mail.attachments.length > 0) {
                     mail_div.insertAdjacentHTML("beforeend",
                         "<br><b>Attachments:</b><div>click to download</div>");
