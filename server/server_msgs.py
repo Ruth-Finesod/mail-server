@@ -44,15 +44,16 @@ class ServerMsgs:
         :param request: GetMsg with the information of the requested user
         :return: List of Lists of MsgResponses with the email information divided by conv uid
         """
-        receiver = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
-        messages_query = {'receiver_uid': receiver[0]}
-        messages = cls.db.query(cls.MSGS_TABLE, messages_query)
+        user = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
+        messages = cls.db.query(cls.MSGS_TABLE, {'receiver_uid': user[0]})
+        messages += cls.db.query(cls.MSGS_TABLE, {'sender_uid': user[0]})
         conv_uids = defaultdict(list)
         for message in messages:
+            receiver = cls.db.query(cls.USERS_TABLE, {'uid': message[2]})[0]
             sender = cls.db.query(cls.USERS_TABLE, {'uid': message[1]})[0]
-            attachments = [attach.model_dump() for attach in cls.get_attachments(message[0])]
-            request_data = {'uid': message[0], 'sender_email': sender[1], 'subject': message[3], 'msg': message[4],
-                            'attachments': attachments, 'read': message[5]}
+            attachments = cls.get_attachments(message[0])
+            request_data = {'uid': message[0], 'sender_email': sender[1], 'receiver_email': receiver[1],
+                            'subject': message[3], 'msg': message[4], 'attachments': attachments, 'read': message[5]}
             message_data = MsgResponse(**request_data)
             conv_uids[message[6]].append(message_data)
         return list(conv_uids.values())

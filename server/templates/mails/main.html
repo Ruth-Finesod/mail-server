@@ -70,7 +70,7 @@
                     }
                 }
                 mail_div.insertAdjacentHTML("beforeend", `
-                <a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
+                <br><a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
                 <button type="button">reply</button></a>`);
 
                 await fetch("http://127.0.0.1:8000/msgs/read", {

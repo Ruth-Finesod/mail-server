@@ -51,7 +51,7 @@
     document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
-        const reply_to = params.get("reply_to")
+        let reply_to = params.get("reply_to")
         if (!reply_to)
             reply_to = 0
 

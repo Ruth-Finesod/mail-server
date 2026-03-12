@@ -34,6 +34,7 @@ class GetMsg(BaseModel):
 class MsgResponse(BaseModel):
     uid: int
     sender_email: str
+    receiver_email: str
     subject: str
     msg: str
     attachments: List[Attachment]
