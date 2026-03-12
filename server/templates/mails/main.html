@@ -19,11 +19,11 @@
 <div id="convContent"></div>
 
 <script type="module">
-
-    document.getElementById("account").textContent += localStorage.getItem("email")
+    const my_email = localStorage.getItem("email")
+    document.getElementById("account").textContent += my_email
 
     const data = {
-        email: localStorage.getItem("email"),
+        email: my_email
     };
 
     const response = await fetch("http://127.0.0.1:8000/msgs/receive", {
@@ -38,24 +38,27 @@
     const mail_div = document.getElementById("convContent");
 
     for (const conv of convs) {
-        const last_mail = conv[conv.length - 1]
+        for (const mail of conv){
+        if (mail.sender_email == my_email)
+            continue;
         const btn = document.createElement("button");
-        btn.innerText = "subject: " + last_mail.subject + " | from:" + last_mail.sender_email;
-        if (last_mail.read) {
+        btn.innerText = "subject: " + mail.subject + " | from:" + mail.sender_email;
+        if (mail.read) {
             btn.style.opacity = "0.5"
         }
         btn.onclick = async () => {
             btn.style.opacity = "0.5"
-
-            mail_div.innerHTML = ''
+            mail_div.innerHTML = `
+                <a href="/send?receiver_email=${mail.sender_email}&subject=${mail.subject}&reply_to=${mail.uid}">
+                <button type="button">reply</button></a><br><br>`
             for (const mail of conv) {
                 mail_div.insertAdjacentHTML("beforeend",
-                    `<br><br><b>From:</b> ${mail.sender_email}<br>
+                    `<b>From:</b> ${mail.sender_email}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
                 <b>Message:</b><br>${mail.msg}<br>`);
                 if (mail.attachments.length > 0) {
                     mail_div.insertAdjacentHTML("beforeend",
-                        "<b>Attachments:</b><div>click to download</div>");
+                        "<br><b>Attachments:</b><div>click to download</div>");
                     for (const file of mail.attachments) {
                         let btn = document.createElement('button');
                         btn.textContent = file.file_name;
@@ -69,9 +72,7 @@
                         mail_div.appendChild(btn)
                     }
                 }
-                mail_div.insertAdjacentHTML("beforeend", `
-                <br><a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
-                <button type="button">reply</button></a>`);
+                mail_div.insertAdjacentHTML("beforeend",`<br><br><br>`);
 
                 await fetch("http://127.0.0.1:8000/msgs/read", {
                     method: "POST",
@@ -79,11 +80,11 @@
                     body: JSON.stringify({uid: mail.uid,})
                 });
             }
-
         };
         container.appendChild(btn);
         container.appendChild(document.createElement("br"))
-    }
+        break;
+    }}
 
 </script>
 </body>
