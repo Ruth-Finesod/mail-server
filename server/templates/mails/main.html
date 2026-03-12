@@ -28,6 +28,7 @@
     });
     const convs = await response.json();
     const container = document.getElementById("mails");
+    const mail_div = document.getElementById("convContent");
 
     for (const conv of convs) {
         const last_mail = conv[conv.length - 1]
@@ -39,13 +40,12 @@
         btn.onclick = async () => {
             btn.style.opacity = "0.5"
 
-            const mail_div = document.getElementById("convContent");
             mail_div.innerHTML = ''
             for (const mail of conv) {
-                mail_div.innerHTML +=
-                    "<br><br><b>From: </b>" + mail.sender_email + "<br>" +
-                    "<b>Subject:</b> " + mail.subject + "<br><br>" +
-                    "<b>Message:</b><br>" + mail.msg + "<br><br>";
+                mail_div.innerHTML += `
+                <br><br><b>From:</b> ${mail.sender_email}<br>
+                <b>Subject:</b> ${mail.subject}<br><br>
+                <b>Message:</b><br>${mail.msg}<br>`;
                 if (mail.attachments.length > 0) {
                     mail_div.innerHTML += "<b>Attachments:</b><div>click to download</div>";
                     for (const file of mail.attachments) {
@@ -61,22 +61,22 @@
                         mail_div.appendChild(btn)
                     }
                 }
+                mail_div.innerHTML += 
+                `<a href="/send?receiver_email=${last_mail.sender_email}&subject=${last_mail.subject}&reply_to=${last_mail.uid}">
+                <button>reply</button></a>`;
 
-                const data = {
-                    uid: mail.uid,
-                };
-                const response = await fetch("http://127.0.0.1:8000/msgs/read", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify(data)
+                await fetch("http://127.0.0.1:8000/msgs/read", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({uid: mail.uid,})
                 });
             }
-
 
         };
         container.appendChild(btn);
         container.appendChild(document.createElement("br"))
     }
+    
 
 </script>
 </body>

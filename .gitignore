@@ -3,3 +3,4 @@ __pycache__/
 venv
 README.md
 *.db
+server/attachments

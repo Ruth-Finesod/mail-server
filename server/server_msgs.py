@@ -58,9 +58,8 @@ class ServerMsgs:
         return list(conv_uids.values())
 
     @classmethod
-    def send_attachments(cls, msg_uid: int, attachments: List[Dict[str, Any]]):
+    def send_attachments(cls, msg_uid: int, attachments: List[Attachment]):
         for attachment in attachments:
-            attachment = Attachment(**attachment)
             uid = cls.db.get_max('uid', cls.ATTACHMENTS_TABLE)
             file_data = base64.b64decode(attachment.file_data)
             with open(cls.ATTACHMENTS_TABLE + '\\' + str(uid), 'wb') as f:
