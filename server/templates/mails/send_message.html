@@ -5,6 +5,7 @@
     <title>send message</title>
   </head>
   <body>
+  <div id="account">you are connected with: </div>
     <form id="NewMessage">
       <div id="to">
         <label>send to:</label>
@@ -29,6 +30,9 @@
       <button>back</button>
     </a>
     <script>
+      const my_email = localStorage.getItem("email");
+      document.getElementById("account").textContent += my_email;
+
       const msgform = document.getElementById("to");
       add = document.getElementById("add");
       add.onclick = function () {

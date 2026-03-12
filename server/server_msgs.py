@@ -29,11 +29,17 @@ class ServerMsgs:
         """
         sender = cls.db.query(cls.USERS_TABLE, {'email': request.email})[0]
         receivers = []
+        msg = ''
+        receivers_exist = True
         for receiver_email in request.receivers_email:
             receiver = cls.db.query(cls.USERS_TABLE, {'email': receiver_email})
             if not receiver:
-                raise BadRequestError('receiver email does not exist')
-            receivers.append(receiver[0])
+                msg += f'{receiver_email}, '
+                receivers_exist = False
+            else:
+                receivers.append(receiver[0])
+        if not receivers_exist:
+            raise BadRequestError(msg + 'does not exists')
         message_data = {'sender_uid': sender[0], 'receivers_uid': ','.join(map(str, [receiver[0] for receiver in receivers])),
                         'subject': request.subject, 'message': request.msg, 'read': False}
         if request.reply_to:
