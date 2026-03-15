@@ -1,24 +1,25 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <link rel="stylesheet" href="/static/style.css">
-    <meta charset="UTF-8">
+  <head>
+    <link rel="stylesheet" href="/static/main_page.css" />
+    <meta charset="UTF-8" />
     <title>best mail</title>
-
-</head>
-<body>
-<a href="/sign_up">
-    <button>sign up</button>
-</a>
-<br>
-<a href="/log_in">
-    <button>log in</button>
-</a>
-</body>
-<script>
-    if(localStorage.getItem('email') != null){
-        window.location.href = "/mails";
+  </head>
+  <body>
+    <h1>BestMail</h1>
+    <h3>By Ruth and Saar (2026)</h3>
+    <a href="/sign_up">
+      <button>sign up</button>
+    </a>
+    <br />
+    <a href="/log_in">
+      <button>log in</button>
+    </a>
+  </body>
+  <script>
+    if (localStorage.getItem("email") != null) {
+      window.location.href = "/mails";
     }
-    console.log(localStorage)
-</script>
+    console.log(localStorage);
+  </script>
 </html>

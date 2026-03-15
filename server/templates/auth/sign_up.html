@@ -1,89 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <link rel="stylesheet" href="/static/style.css">
-    <meta charset="UTF-8">
+  <head>
+    <link rel="stylesheet" href="/static/auth.css" />
+    <meta charset="UTF-8" />
     <title>Sign Up</title>
-</head>
-<body>
-<form id="SignUpForm">
-    <label>email</label>
-    <input id="email">
-    <br>
-    <label>full name</label>
-    <input id="full_name">
-    <br>
-    <label>password</label>
-    <input id="password" type="password">
-    <br>
-    <label>repeat password</label>
-    <input id="repeat_password" type="password">
-    <br>
-    <br>
-    <button id="submit" type="submit" disabled>SignUp</button>
-</form>
-<div id="message"><br></div>
+  </head>
+  <body>
+    <form id="SignUpForm">
+      <label>email</label>
+      <input id="email" />
+      <br />
+      <label>full name</label>
+      <input id="full_name" />
+      <br />
+      <label>password</label>
+      <input id="password" type="password" />
+      <br />
+      <label>repeat password</label>
+      <input id="repeat_password" type="password" />
+      <br />
+      <br />
+      <button id="submit" type="submit" disabled>SignUp</button>
+    </form>
+    <div id="message"><br /></div>
+    <p>already have an acoount? <a href="/log_in">click here</a> to log in</p>
 
-<script>
-const msg = document.getElementById("message")
-const submit = document.getElementById("submit")
+    <script>
+      const msg = document.getElementById("message");
+      const submit = document.getElementById("submit");
 
-const password = document.getElementById("password");
-const repeatPassword = document.getElementById("repeat_password");
+      const password = document.getElementById("password");
+      const repeatPassword = document.getElementById("repeat_password");
 
-function validate() {
-    msg.innerHTML = '<br>';
-    let valid = true;
-    if (password.value.length < 8) {
-        msg.innerHTML += 'Password must be at least 8 characters<br>';
-        valid = false;
-    }
-    if (!/[A-Z]/.test(password.value)) {
-        msg.innerHTML += 'Must include uppercase letter<br>';
-        valid = false;
-    }
-    if (!/[a-z]/.test(password.value)) {
-        msg.innerHTML += 'Must include lowercase letter<br>';
-        valid = false;
-    }
-    if (!/[0-9]/.test(password.value)) {
-        msg.innerHTML += 'Must include number<br>';
-        valid = false;
-    }
-    if (password.value !== repeatPassword.value) {
-        msg.innerHTML += 'Passwords do not match<br>';
-        valid = false;
-    }
-    submit.disabled = !valid;
-}
-validate()
-password.oninput = validate;
-repeatPassword.oninput = validate;
+      function validate() {
+        msg.innerHTML = "<br>";
+        let valid = true;
+        if (password.value.length < 8) {
+          msg.innerHTML += "Password must be at least 8 characters<br>";
+          valid = false;
+        }
+        if (!/[A-Z]/.test(password.value)) {
+          msg.innerHTML += "Must include uppercase letter<br>";
+          valid = false;
+        }
+        if (!/[a-z]/.test(password.value)) {
+          msg.innerHTML += "Must include lowercase letter<br>";
+          valid = false;
+        }
+        if (!/[0-9]/.test(password.value)) {
+          msg.innerHTML += "Must include number<br>";
+          valid = false;
+        }
+        if (password.value !== repeatPassword.value) {
+          msg.innerHTML += "Passwords do not match<br>";
+          valid = false;
+        }
+        submit.disabled = !valid;
+      }
+      validate();
+      password.oninput = validate;
+      repeatPassword.oninput = validate;
 
-document.getElementById("SignUpForm").onsubmit = async (e) => {
-    e.preventDefault();
-    if(submit.disabled) return;
+      document.getElementById("SignUpForm").onsubmit = async (e) => {
+        e.preventDefault();
+        if (submit.disabled) return;
 
-    const data = {
-        email: document.getElementById("email").value,
-        full_name: document.getElementById("full_name").value,
-        password: password.value
-    };
+        const data = {
+          email: document.getElementById("email").value,
+          full_name: document.getElementById("full_name").value,
+          password: password.value,
+        };
 
-    const response = await fetch("http://127.0.0.1:8000/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+        const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-    if (response.status == 200) {
-        localStorage.setItem("email", data.email);
-        window.location.href = "/mails";
-    } else {
-        const result = await response.json();
-        msg.innerText = result.message;
-    }
-};
-</script>
-</body>
+        if (response.status == 200) {
+          localStorage.setItem("email", data.email);
+          window.location.href = "/mails";
+        } else {
+          const result = await response.json();
+          msg.innerText = result.message;
+        }
+      };
+    </script>
+  </body>
 </html>

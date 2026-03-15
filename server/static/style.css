@@ -7,14 +7,41 @@ body {
     border: solid #7383d5;
     background-color: #a4c5ed;
     padding: 6px;
+    width: 100%;
     border-radius: 2px;
+    text-align: left;
 }
 
 #convContent button {
-    border: solid #176ee1;
-    background-color: #438de8;
+    border: solid #0c315e;
+    background-color: #3572bd;
     padding: 6px;
     border-radius: 15px;
+}
+
+
+#mailLayout {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+#divider {
+  width: 2px;
+  background-color: #595027;
+  min-height: 500px;
+}
+
+#mailsSection {
+  width: 35%;
+}
+
+#convSection {
+  width: 65%;
+}
+
+#convContent {
+  text-align: left;
 }
 
 button {

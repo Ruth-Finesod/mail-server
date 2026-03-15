@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/auth.css" />
     <meta charset="UTF-8" />
     <title>send message</title>
   </head>
   <body>
-  <div id="account">you are connected with: </div>
+    <div id="account">you are connected with:</div>
     <form id="NewMessage">
       <div id="to">
         <label>send to:</label>
@@ -18,7 +18,7 @@
       <input id="subject" />
       <br />
       <label>message</label>
-      <input id="message" />
+      <textarea id="message"></textarea>
       <br />
       <label>attachments</label>
       <input id="attachments" type="file" multiple />
@@ -42,71 +42,77 @@
         msgform.appendChild(input);
       };
 
-    const params = new URLSearchParams(window.location.search);
-    const receivers_email = params.getAll("receiver_email")
-    const subject = params.get("subject")
-    if (params.get('reply_to')) {
-        document.getElementById("subject").value = subject
-        document.getElementById("receivers_email").value = receivers_email[0]
-        const to = document.getElementById('to')
-        for (const receiver of receivers_email.slice(1, receivers_email.length)) {
-            var input = document.createElement("input");
-            input.className = "receivers_email";
-            input.value = receiver;
-            to.appendChild(input)
+      const params = new URLSearchParams(window.location.search);
+      const receivers_email = params.getAll("receiver_email");
+      const subject = params.get("subject");
+      if (params.get("reply_to")) {
+        document.getElementById("subject").value = subject;
+        document.getElementById("receivers_email").value = receivers_email[0];
+        const to = document.getElementById("to");
+        for (const receiver of receivers_email.slice(
+          1,
+          receivers_email.length,
+        )) {
+          var input = document.createElement("input");
+          input.className = "receivers_email";
+          input.value = receiver;
+          to.appendChild(input);
         }
-    }
+      }
 
-    async function filesToAttachments(files) {
+      async function filesToAttachments(files) {
         const result = [];
         for (const file of files) {
-            const arrayBuffer = await file.arrayBuffer();
-            const bytes = new Uint8Array(arrayBuffer);
-            let binary = '';
-            for (let b of bytes) binary += String.fromCharCode(b);
-            const base64 = btoa(binary);
+          const arrayBuffer = await file.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuffer);
+          let binary = "";
+          for (let b of bytes) binary += String.fromCharCode(b);
+          const base64 = btoa(binary);
 
-            result.push({
-                "file_name": file.name,
-                "file_data": base64
-            });
+          result.push({
+            file_name: file.name,
+            file_data: base64,
+          });
         }
 
         return result;
-    }
+      }
 
-    document.getElementById("NewMessage").onsubmit = async (e) => {
+      document.getElementById("NewMessage").onsubmit = async (e) => {
         e.preventDefault();
 
-        const receivers_email = Array.from(document.querySelectorAll('.receivers_email')).map(i => i.value);
-        console.log(receivers_email)
+        const receivers_email = Array.from(
+          document.querySelectorAll(".receivers_email"),
+        ).map((i) => i.value);
+        console.log(receivers_email);
 
-        let reply_to = params.get("reply_to")
-        if (!reply_to)
-            reply_to = 0
+        let reply_to = params.get("reply_to");
+        if (!reply_to) reply_to = 0;
 
-        const attachments = await filesToAttachments(Array.from(document.getElementById("attachments").files))
+        const attachments = await filesToAttachments(
+          Array.from(document.getElementById("attachments").files),
+        );
         const data = {
-            email: localStorage.getItem("email"),
-            receivers_email: receivers_email,
-            subject: document.getElementById("subject").value,
-            msg: document.getElementById("message").value,
-            reply_to: reply_to,
-            attachments: attachments
+          email: localStorage.getItem("email"),
+          receivers_email: receivers_email,
+          subject: document.getElementById("subject").value,
+          msg: document.getElementById("message").value,
+          reply_to: reply_to,
+          attachments: attachments,
         };
-        console.log(data)
+        console.log(data);
         const response = await fetch("http://127.0.0.1:8000/msgs/send", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
         });
         {
-            const result = await response.json();
-            document.getElementById("response").innerText = result.message;
+          const result = await response.json();
+          document.getElementById("response").innerText = result.message;
         }
-    };
-</script>
-</body>
+      };
+    </script>
+  </body>
 </html>
