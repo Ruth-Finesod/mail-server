@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="/static/style.css" />
     <meta charset="UTF-8" />
     <title>best_mail</title>
   </head>
@@ -18,10 +18,17 @@
     <button id="inbox">Inbox</button>
     <button id="sent">Sent</button>
     <br />
-    <h3>MAILS:</h3>
-    <div id="mails"></div>
-    <h3>CONVERSATION:</h3>
-    <div id="convContent"></div>
+    <div id="mailLayout">
+      <div id="mailsSection">
+        <h3>MAILS:</h3>
+        <div id="mails"></div>
+      </div>
+      <div id="divider"></div>
+      <div id="convSection">
+        <h3>CONVERSATION:</h3>
+        <div id="convContent"></div>
+      </div>
+    </div>
 
     <script type="module">
       const my_email = localStorage.getItem("email");
@@ -94,7 +101,7 @@
                   <b>From:</b> ${mail.sender_email}<br>
                     <b>To:</b> ${mail.receivers_email.join(", ")}<br>
                 <b>Subject:</b> ${mail.subject}<br><br>
-                <b>Message:</b><br>${mail.msg}<br>`,
+                <b>Message:</b><br><div style="white-space: pre-wrap;">${mail.msg.replace(/\\n/g, "\n")}</div><br>`,
                 );
                 if (mail.attachments.length > 0) {
                   mail_div.insertAdjacentHTML(
