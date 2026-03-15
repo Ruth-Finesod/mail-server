@@ -1,0 +1,35 @@
+body {
+  background-color: #e6e4bd;
+  font-family: Calibri;
+}
+
+#mails button {
+    border: solid #7383d5;
+    background-color: #a4c5ed;
+    padding: 6px;
+    border-radius: 2px;
+}
+
+#convContent button {
+    border: solid #176ee1;
+    background-color: #438de8;
+    padding: 6px;
+    border-radius: 15px;
+}
+
+button {
+    border: solid #595027;
+    background-color: #ccac83;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+h3, p, div, label {
+    color: #530101;
+}
+
+input {
+    padding: 3px;
+    border-radius: 3px;
+}
+

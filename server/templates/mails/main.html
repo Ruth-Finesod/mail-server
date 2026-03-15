@@ -61,10 +61,10 @@
                 ? "subject: " + mail.subject + " | to: " + mail.receivers_email
                 : "subject: " + mail.subject + " | from: " + mail.sender_email;
             if (mail.read) {
-              btn.style.opacity = "0.8";
+              btn.style.filter = "saturate(0.1)";
             }
             btn.onclick = async () => {
-              btn.style.opacity = "0.8";
+              btn.style.filter = "saturate(0.1)";
 
               mail_div.innerHTML = ``;
               for (const mail of conv) {
